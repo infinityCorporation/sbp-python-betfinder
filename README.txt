@@ -56,8 +56,9 @@ UPDATES:
 ToDo:
  This program is now finding positive EV bets for NCAA Football and Basketball as well
  as for NBA and NFL games. The next step is to figure out specifically how to return and
- package all necessary data to get it into storage. After getting the data into storage it will need to be accesses by the client, this can
- be grabbed and sent with the go manager script.
+ package all necessary data to get it into storage. After getting the data into storage it
+ will need to be accesses by the client, this can be grabbed and sent with the go manager
+ script.
  A method needs to be found for how to call the script from the go server. This will require
  information such as where to host the script (on the same server or different), what determines
  the frequency with which it is called, and how maintenance on the script can be done when in
