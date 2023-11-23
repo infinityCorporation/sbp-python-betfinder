@@ -1,0 +1,33 @@
+The script will compile the data found through its analysis of the bets pulled
+from the api. Once all the bets have been analyzed, a document will be constructed
+with the necessary information according to the following schema.
+
+SCHEMA:
+
+ - Title: UTC Time of Update
+ - Bet list:
+   - Bet object:
+     - Core Values: (display necessary)
+       - Expected Value (%)
+       - Event Date (Human Time)
+       - Event:
+         - Contenders
+         - Sport
+         - League
+       - Bets (Two for Two-way markets)
+       - Books
+       - No Vig Odds
+       - Market Width
+       - Last Updated (Human Time)
+   - Logging:
+     - Time processed
+     - Total PEV Bets found
+     - All Vig associated with Bets
+     - Document Size
+
+
+In general, this schema will allow the client to easily parse and find the new
+bets that the algorithm has found. Additionally, the logging can allow for better
+system maintenance and success tracking. Finally, it will be interesting to find
+a way to keep track of the number of bets that change per update to get a better
+understanding of how often the odds change in the sports betting market.

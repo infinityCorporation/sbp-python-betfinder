@@ -11,6 +11,12 @@ functions for computations on odds prices in american form. Below are lists of
 what the script supports, the api the data is called from, updates, required
 packages, and tasks still to do.
 
+There is an additional script, upload.py, with the purpose of uploading the file to
+the Amazon s3 storage bucket once it has been created and saved. This script is
+called only once the file has been created and saved locally. Then, the script is
+called and the file is uploaded. Once the upload is confirmed, the file will be deleted
+from local storage.
+
 The currently supported sports are:
  - NCAA Football
  - NCAA Basketball
@@ -41,8 +47,10 @@ REQUIRED PACKAGES:
  - > Python 3.0
  - http (built-int)
  - http.client (built-int)
+ - typing (built-in)
  - NumPy
  - json
+ - boto3 (s3 sdk)
  - MatPlotLib.pyplot (Testing)
 
 UPDATES:
@@ -52,6 +60,7 @@ UPDATES:
    of a betting line.
  - The program currently has production code such as the main loops and functions
    and testing code such as certain lists and graphing utilities.
+ - The core mathematical functions have
 
 ToDo:
  This program is now finding positive EV bets for NCAA Football and Basketball as well
@@ -65,4 +74,7 @@ ToDo:
  production.
  Consider how multiline bets may be added to this script. There is a possibility that they
  may require their own script to more accurately and efficiently analyze the data.
+ Error handling is needed in specific locations. The pull from the api needs to be checked for
+ correct form. The main loops need to check to make sure that what they are looking for exists.
+ There should be some form of error handling on the storage saving as well.
 
