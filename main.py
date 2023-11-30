@@ -7,12 +7,14 @@ import matplotlib.pyplot as plt
 import http
 import http.client as client
 import json
+import csv
 from upload import file_upload
 
 apiKey = "5ab51a74ab7fea2414dbade0cf9d7229"
 host = "api.the-odds-api.com"
 sports = ['americanfootball_nfl', 'americanfootball_ncaaf', 'basketball_nba', 'basketball_ncaab']
 markets = ['h2h', 'spreads', 'totals']
+#markets = ['h2h']
 
 betList = []
 priceList = []
@@ -26,7 +28,7 @@ totalVig = []
 
 def calculate_implied_prob(odds: int, identity: bool) -> float:
     """
-    Calculate the implied percentage odds given the numeric odds and the the over/under identity
+    Calculate the implied percentage odds given the numeric odds and the over/under identity
     :param odds: int:
     :param identity: bool:
     :return probability: float:
@@ -70,6 +72,23 @@ def calculate_implied_vig_two_way(implied_under: float, implied_over: float) -> 
     return round(implied_vig, 2), round(adjusted_implied_over, 2), round(adjusted_implied_under, 2)
 
 
+def calculate_implied_vig_two_way_v2(implied_under: float, implied_over: float) -> tuple[float | float | float]:
+    """
+    This is the new version of calculating the no vig odds and returning the juice.
+    The
+    :param implied_under:
+    :param implied_over:
+    :return:
+    """
+    total_implied = np.abs(implied_over) + np.abs(implied_under)
+    print(total_implied)
+    vig: float = (1 - ((1/total_implied) * 100)) * 100
+    print("VIG: ", vig)
+    new_over: float = (implied_over / total_implied) * 100
+    new_under: float = (implied_under / total_implied) * 100
+    return round(vig, 2), round(new_over, 2), round(new_under, 2)
+
+
 def calculate_expected_value(winning_prod: float, losing_prob: float, implied_profit: float) -> float:
     """
     Given the winning and losing probability and the current bet price, return the expected value in
@@ -79,8 +98,8 @@ def calculate_expected_value(winning_prod: float, losing_prob: float, implied_pr
     :param implied_profit: float:
     :return expected_value: float:
     """
-    expected_value: float = (((np.abs(winning_prod) / 100) * np.abs(implied_profit)) -
-                             ((np.abs(losing_prob) / 100) * 100))
+    losing = 100 - winning_prod
+    expected_value: float = ((winning_prod / 100) * implied_profit) - losing
     return round(expected_value, 2)
 
 
@@ -104,9 +123,12 @@ def h2h_loop_call(parsed_url):
     for a in parsed_url:
         for x in a["bookmakers"]:
             for y in x['markets']:
+                sport_title = a['sport_title']
+                game = a['home_team'] + " vs " + a['away_team']
+                bet_type = y['key']
                 for z in y['outcomes']:
                     if z['price'] > 0:
-                        odds = np.abs(int(z['price']))
+                        odds = int(z['price'])
                         probability = calculate_implied_prob(odds, False)
                         profit = calculate_implied_profit(odds, False)
                         underdog = {
@@ -126,11 +148,13 @@ def h2h_loop_call(parsed_url):
                             'implied_profit': profit
                         }
 
-                vig, ap_over, ap_under = calculate_implied_vig_two_way(underdog['implied_probability'],
+                vig, ap_over, ap_under = calculate_implied_vig_two_way_v2(underdog['implied_probability'],
                                                                        favorite['implied_probability'])
 
-                ev_ap_over = calculate_expected_value(ap_over, ap_under, favorite['implied_profit'])
-                ev_ap_under = calculate_expected_value(ap_under, ap_over, underdog['implied_profit'])
+                ev_ap_over = calculate_expected_value(ap_over, ap_under,
+                                                      favorite['implied_profit'])
+                ev_ap_under = calculate_expected_value(ap_under, ap_over,
+                                                       underdog['implied_profit'])
 
                 totalEvUnder.append(ev_ap_under)
                 totalEvOver.append(ev_ap_over)
@@ -138,9 +162,14 @@ def h2h_loop_call(parsed_url):
 
                 if ev_ap_over > 0:
                     apEvList.append({
+                        "sport_title": sport_title,
+                        "game": game,
+                        "bet_type": bet_type,
                         "over_adjusted_value": ev_ap_over,
                         "over_adjusted_probability": ap_over,
+                        "under_adjusted_probability": ap_under,
                         "favorite": favorite,
+                        "underdog": underdog,
                         "sports_book": x['key'],
                         "bet_direction": "over",
                     })
@@ -149,9 +178,13 @@ def h2h_loop_call(parsed_url):
                     print("A h2h positive return found.")
                 if ev_ap_under > 0:
                     apEvList.append({
+                        "sport_title": sport_title,
+                        "game": game,
+                        "bet_type": bet_type,
                         "under_adjusted_value": ev_ap_under,
                         "under_adjusted_probability": ap_under,
                         "underdog": underdog,
+                        "favorite": favorite,
                         "sports_book": x['key'],
                         "bet_direction": "under",
                     })
@@ -172,12 +205,19 @@ def points_based_loop_call(parsed_url):
     for a in parsed_url:
         for x in a['bookmakers']:
             for y in x['markets']:
+
+
+                sport_title = a['sport_title']
+                game = a['home_team'] + " vs " + a['away_team']
+                bet_type = y['key']
                 outcome_0 = y['outcomes'][0]
                 outcome_1 = y['outcomes'][1]
                 odds_0 = np.abs(int(y['outcomes'][0]['price']))
                 odds_1 = np.abs(int(y['outcomes'][1]['price']))
+                print(outcome_0, outcome_1)
 
                 if outcome_0['price'] > outcome_1['price']:
+
                     out_0_probability = calculate_implied_prob(odds_0, True)
                     out_0_profit = calculate_implied_profit(odds_0, True)
                     out_1_probability = calculate_implied_prob(odds_1, False)
@@ -212,7 +252,7 @@ def points_based_loop_call(parsed_url):
                         'implied_profit': out_0_profit,
                     }
 
-                vig, ap_over, ap_under = calculate_implied_vig_two_way(underdog['implied_probability'],
+                vig, ap_over, ap_under = calculate_implied_vig_two_way_v2(underdog['implied_probability'],
                                                                        favorite['implied_probability'])
                 ev_ap_over = calculate_expected_value(ap_over, ap_under, favorite['implied_profit'])
                 ev_ap_under = calculate_expected_value(ap_under, ap_over, underdog['implied_profit'])
@@ -223,9 +263,13 @@ def points_based_loop_call(parsed_url):
 
                 if ev_ap_over > 0:
                     apEvList.append({
+                        "sport_title": sport_title,
+                        "game": game,
+                        "bet_type": bet_type,
                         "over_adjusted_value": ev_ap_over,
                         "over_adjusted_probability": ap_over,
                         "favorite": favorite,
+                        "underdog": underdog,
                         "sports_book": x['key'],
                         "bet_direction": "over",
                     })
@@ -234,9 +278,13 @@ def points_based_loop_call(parsed_url):
                     print("A points based positive return found.")
                 if ev_ap_under > 0:
                     apEvList.append({
+                        "sport_title": sport_title,
+                        "game": game,
+                        "bet_type": bet_type,
                         "under_adjusted_value": ev_ap_under,
                         "under_adjusted_probability": ap_under,
                         "underdog": underdog,
+                        "favorite": favorite,
                         "sports_book": x['key'],
                         "bet_direction": "under",
                     })
@@ -264,6 +312,26 @@ for s in sports:
         else:
             points_based_loop_call(parsed)
 
+with open('dataFile.csv', 'w', newline='') as csvfile:
+    writer = csv.writer(csvfile, delimiter=' ', quotechar='|', quoting=csv.QUOTE_MINIMAL)
+
+    writer.writerow(['sport:', 'game:', 'book:', 'direction:', 'type:', 'value:', 'prob:'])
+    for x in apEvList:
+        try:
+            game = x['game']
+            book = x['sports_book']
+            direction = x['bet_direction']
+            bet_type = x['bet_type']
+            sport_title = x['sport_title']
+            if direction == 'over':
+                av = x['over_adjusted_value']
+                ap = x['over_adjusted_probability']
+            else:
+                av = x['under_adjusted_value']
+                ap = x['under_adjusted_probability']
+            writer.writerow([sport_title, game, book, direction, av, ap])
+        except:
+            print(x)
 
 plt.scatter(vigList, betList)
 plt.show()
