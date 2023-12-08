@@ -359,5 +359,8 @@ for x in totalEvUnder:
 for x in apEvList:
     print(":(ADJ.EV): => ", x)
 
+#Test file save
+file_upload('dataFile.csv', )
+
 # Close the connection
 conn.close()
