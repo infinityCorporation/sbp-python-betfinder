@@ -7,11 +7,16 @@ import http
 import http.client as client
 import json
 import csv
+import uuid
+from datetime import datetime, timezone
 
-# future imports
-from upload import file_upload
+from scripts.dbmanager import check_duplicates, check_bet_time, check_odds_change
 
-apiKey = "5ab51a74ab7fea2414dbade0cf9d7229"
+# Different API keys for free testing:
+# frisbiecorp@gmail.com: 5ab51a74ab7fea2414dbade0cf9d7229
+# contact@arrayassistant.ai: 098b369ca52dc641b2bea6c901c24887
+
+apiKey = "098b369ca52dc641b2bea6c901c24887"
 host = "api.the-odds-api.com"
 sports = ['americanfootball_nfl', 'americanfootball_ncaaf', 'basketball_nba', 'basketball_ncaab']
 markets = ['h2h', 'spreads', 'totals']
@@ -28,6 +33,9 @@ totalEvUnder = []
 totalEvOver = []
 totalVig = []
 totalList = []
+
+current_utc_time = datetime.now(timezone.utc)
+date_time = current_utc_time.strftime('%Y-%m-%dT%H:%M:%SZ')
 
 
 def calculate_implied_under(odds: int) -> float:
@@ -54,7 +62,7 @@ def calculate_implied_over(odds: int) -> float:
 
 def calculate_implied_profit(odds: int, identity: bool) -> float:
     """
-    Calculate the implied profit given the odds and the over/under identity
+    Calculate the implied profit given the odds and the over/under identity.
     :param odds: int:
     :param identity: bool:
     :return implied_profit: float:
@@ -205,6 +213,8 @@ def h2h_loop_call(parsed_url):
                 sport = a['sport_title']
                 bet = y['key']
                 teams = y['outcomes'][0]['name'] + " vs " + y['outcomes'][1]['name']
+                start_time = a['commence_time']
+                update_time = date_time
 
                 odds_0 = y['outcomes'][0]['price']
                 odds_1 = y['outcomes'][1]['price']
@@ -269,6 +279,8 @@ def h2h_loop_call(parsed_url):
                         "sport_title": sport,
                         "game": teams,
                         "bet_type": bet,
+                        "start_time": start_time,
+                        "updated_at": update_time,
                         "over_adjusted_value": ev_ap_over,
                         "over_adjusted_probability": ap_over,
                         "under_adjusted_probability": ap_under,
@@ -285,6 +297,8 @@ def h2h_loop_call(parsed_url):
                         "sport_title": sport,
                         "game": teams,
                         "bet_type": bet,
+                        "start_time": start_time,
+                        "updated_at": update_time,
                         "under_adjusted_value": ev_ap_under,
                         "under_adjusted_probability": ap_under,
                         "underdog": underdog,
@@ -313,6 +327,8 @@ def points_based_loop_call(parsed_url):
                 sport_title = a['sport_title']
                 game = a['home_team'] + " vs " + a['away_team']
                 bet_type = y['key']
+                start_time = a['commence_time']
+                update_time = date_time
 
                 outcome_0 = y['outcomes'][0]
                 outcome_1 = y['outcomes'][1]
@@ -377,6 +393,8 @@ def points_based_loop_call(parsed_url):
                         "sport_title": sport_title,
                         "game": game,
                         "bet_type": bet_type,
+                        "start_time": start_time,
+                        "updated_at": update_time,
                         "over_adjusted_value": ev_ap_over,
                         "over_adjusted_probability": ap_over,
                         "favorite": favorite,
@@ -392,6 +410,8 @@ def points_based_loop_call(parsed_url):
                         "sport_title": sport_title,
                         "game": game,
                         "bet_type": bet_type,
+                        "start_time": start_time,
+                        "updated_at": update_time,
                         "under_adjusted_value": ev_ap_under,
                         "under_adjusted_probability": ap_under,
                         "underdog": underdog,
@@ -412,50 +432,99 @@ def three_way_loop_call(parsed_url):
     """
 
 
+def multi_way_loop_call(parsed_url):
+    """
+    This is for bets that contain 4 or more individual lines that can be bet on.
+    :param parsed_url:
+    :return:
+    """
+
+
 conn = http.client.HTTPSConnection(host)
 
-for s in sports:
-    for m in markets:
 
-        url = "/v4/sports/" + s + "/odds/?regions=us&oddsFormat=american&markets=" + m + "&apiKey=" + apiKey
-        conn.request("GET", url)
+def run_script(connection, cur):
+    """
+    This is the main function that runs the program so that it can be
+    called from another script.
+    :param connection:
+    :param cur:
+    :return:
+    """
+    for s in sports:
+        for m in markets:
 
-        response = conn.getresponse()
-        content = response.read()
-        parsed = json.loads(content)
+            url = "/v4/sports/" + s + "/odds/?regions=us&oddsFormat=american&markets=" + m + "&apiKey=" + apiKey
+            conn.request("GET", url)
 
-        print(parsed)
+            response = conn.getresponse()
+            content = response.read()
+            parsed = json.loads(content)
 
-        if m == 'h2h':
-            h2h_loop_call(parsed)
-        else:
-            points_based_loop_call(parsed)
+            print(parsed)
 
-conn.close()
-
-with open('../dataFile.csv', 'w', newline='') as csvfile:
-    writer = csv.writer(csvfile, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
-
-    writer.writerow(['sport:', 'game:', 'book:', 'direction:', 'type:', 'value:', 'prob:', 'price:'])
-    for x in apEvList:
-        try:
-            game = x['game']
-            book = x['sports_book']
-            direction = x['bet_direction']
-            bet_type = x['bet_type']
-            sport_title = x['sport_title']
-            price = "None Provided"
-            if direction == 'over':
-                av = x['over_adjusted_value']
-                ap = x['over_adjusted_probability']
-                price = x['favorite']['price']
+            if m == 'h2h':
+                h2h_loop_call(parsed)
             else:
-                av = x['under_adjusted_value']
-                ap = x['under_adjusted_probability']
-                price = x['underdog']['price']
-            writer.writerow([sport_title, game, book, direction, bet_type, av, ap, price])
-        except:
-            print(x)
+                points_based_loop_call(parsed)
+
+            conn.close()
+
+            with open('./files/dataFile.csv', 'w', newline='') as csvfile:
+                writer = csv.writer(csvfile, delimiter=',', quotechar=' ', quoting=csv.QUOTE_MINIMAL)
+
+                writer.writerow(['sport:', 'game:', 'book:', 'direction:', 'type:', 'value:', 'prob:', 'price:'])
+                for x in apEvList:
+                    try:
+                        game = x['game']
+                        book = x['sports_book']
+                        direction = x['bet_direction']
+                        bet_type = x['bet_type']
+                        sport_title = x['sport_title']
+                        price = "None Provided"
+                        if direction == 'over':
+                            av = x['over_adjusted_value']
+                            ap = x['over_adjusted_probability']
+                            price = x['favorite']['price']
+                        else:
+                            av = x['under_adjusted_value']
+                            ap = x['under_adjusted_probability']
+                            price = x['underdog']['price']
+                        writer.writerow([sport_title, game, book, direction, bet_type, av, ap, price])
+                    except:
+                        print(x)
+
+            for x in apEvList:
+                game = x['game']
+                book = x['sports_book']
+                direction = x['bet_direction']
+                bet_type = x['bet_type']
+                sport_title = x['sport_title']
+                commence_time = x['start_time']
+                updated_at = x['updated_at']
+                price = "N/A"
+                uid = str(uuid.uuid4())
+                if direction == 'over':
+                    av = x['over_adjusted_value']
+                    ap = x['over_adjusted_probability']
+                    price = x['favorite']['price']
+                else:
+                    av = x['under_adjusted_value']
+                    ap = x['under_adjusted_probability']
+                    price = x['underdog']['price']
+                data = (uid, sport_title, game, book, direction, bet_type, av, ap, price, commence_time, updated_at)
+                # This is where the function for checking for duplicates will go
+                check_duplicates(data, cur)
+                check_odds_change(data, cur)
+                sql = ("INSERT INTO bet_data (id, sport, game, book, direction, type, value, probability, price, commence_time, last_update) "
+                       "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+                cur.execute(sql, data)
+                connection.commit()
+
+    check_bet_time(cur)
+    connection.commit()
+
+
 
 plt.scatter(vigList, betList)
 plt.show()
@@ -477,9 +546,8 @@ for x in apEvList:
     print(":(ADJ.EV): => ", x)
 
 
-#Test file save
+# Test file save
 # file_upload('dataFile.csv', )
 
 # Close the connection
 conn.close()
-

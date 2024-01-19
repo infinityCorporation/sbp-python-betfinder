@@ -1,0 +1,356 @@
+sport:,game:,book:,direction:,type:,value:,prob:,price:
+NFL, Detroit  Lions  vs  Tampa  Bay  Buccaneers ,lowvig,over,spreads,1.44,50.97,-101
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,fanduel,over,spreads,5.2,52.6,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,lowvig,over,spreads,0.16,51.3,105
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,betonlineag,over,spreads,3.76,52.14,-101
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,draftkings,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,betrivers,over,spreads,3.67,52.35,102
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,unibet_us,over,spreads,3.67,52.35,102
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,betmgm,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,bovada,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,williamhill_us,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,superbook,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,betus,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,mybookieag,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,wynnbet,over,spreads,4.76,52.38,100
+NBA, Atlanta  Hawks  vs  Orlando  Magic ,lowvig,over,spreads,1.91,51.21,-101
+NBA, Boston  Celtics  vs  San  Antonio  Spurs ,lowvig,over,spreads,1.91,51.21,-101
+NBA, Cleveland  Cavaliers  vs  Milwaukee  Bucks ,lowvig,over,spreads,1.91,51.21,-101
+NBA, Los  Angeles  Lakers  vs  Dallas  Mavericks ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Appalachian  St  Mountaineers  vs  Georgia  St  Panthers ,betonlineag,over,spreads,1.2,52.31,107
+NCAAB, Appalachian  St  Mountaineers  vs  Georgia  St  Panthers ,draftkings,over,spreads,2.17,52.33,105
+NCAAB, Mercer  Bears  vs  Chattanooga  Mocs ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Robert  Morris  Colonials  vs  Detroit  Mercy  Titans ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Wofford  Terriers  vs  East  Tennessee  St  Buccaneers ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, Miami  Hurricanes  vs  Florida  St  Seminoles ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Miami  Hurricanes  vs  Florida  St  Seminoles ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, Radford  Highlanders  vs  Gardner-Webb  Bulldogs ,fanduel,over,spreads,1.33,51.66,-104
+NCAAB, Radford  Highlanders  vs  Gardner-Webb  Bulldogs ,wynnbet,over,spreads,3.76,52.14,-101
+NCAAB, Kentucky  Wildcats  vs  Mississippi  St  Bulldogs ,betonlineag,over,spreads,0.88,51.43,-104
+NCAAB, Kentucky  Wildcats  vs  Mississippi  St  Bulldogs ,lowvig,over,spreads,2.92,51.46,100
+NCAAB, Kentucky  Wildcats  vs  Mississippi  St  Bulldogs ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, LSU  Tigers  vs  Ole  Miss  Rebels ,betonlineag,over,spreads,1.84,51.67,-103
+NCAAB, LSU  Tigers  vs  Ole  Miss  Rebels ,lowvig,over,spreads,2.39,51.45,101
+NCAAB, Navy  Midshipmen  vs  Lehigh  Mountain  Hawks ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Navy  Midshipmen  vs  Lehigh  Mountain  Hawks ,fanduel,over,spreads,1.33,51.66,-104
+NCAAB, Loyola  (Chi)  Ramblers  vs  Massachusetts  Minutemen ,betonlineag,over,spreads,1.84,51.67,-103
+NCAAB, Loyola  (Chi)  Ramblers  vs  Massachusetts  Minutemen ,lowvig,over,spreads,2.39,51.45,101
+NCAAB, Loyola  (Chi)  Ramblers  vs  Massachusetts  Minutemen ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, Rutgers  Scarlet  Knights  vs  Nebraska  Cornhuskers ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Rutgers  Scarlet  Knights  vs  Nebraska  Cornhuskers ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, St.  Bonaventure  Bonnies  vs  Rhode  Island  Rams ,betonlineag,over,spreads,4.76,52.38,100
+NCAAB, St.  Bonaventure  Bonnies  vs  Rhode  Island  Rams ,lowvig,over,spreads,0.88,51.43,104
+NCAAB, UNC  Greensboro  Spartans  vs  The  Citadel  Bulldogs ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Southern  Miss  Golden  Eagles  vs  Arkansas  St  Red  Wolves ,lowvig,over,spreads,0.94,50.97,-102
+NCAAB, Evansville  Purple  Aces  vs  Valparaiso  Beacons ,fanduel,over,spreads,1.33,51.66,-104
+NCAAB, Texas  State  Bobcats  vs  Louisiana  Ragin'  Cajuns ,betonlineag,over,spreads,0.88,51.43,-104
+NCAAB, Texas  State  Bobcats  vs  Louisiana  Ragin'  Cajuns ,lowvig,over,spreads,2.92,51.46,100
+NCAAB, UIC  Flames  vs  Murray  St  Racers ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, UIC  Flames  vs  Murray  St  Racers ,wynnbet,over,spreads,3.76,52.14,-101
+NCAAB, Oklahoma  Sooners  vs  West  Virginia  Mountaineers ,draftkings,over,spreads,3.67,52.35,102
+NCAAB, Oklahoma  Sooners  vs  West  Virginia  Mountaineers ,lowvig,over,spreads,0.88,51.43,104
+NCAAB, Oklahoma  Sooners  vs  West  Virginia  Mountaineers ,betonlineag,over,spreads,4.76,52.38,100
+NCAAB, UAB  Blazers  vs  Tulane  Green  Wave ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, UAB  Blazers  vs  Tulane  Green  Wave ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, UAB  Blazers  vs  Tulane  Green  Wave ,wynnbet,over,spreads,3.76,52.14,-101
+NCAAB, Tulsa  Golden  Hurricane  vs  UTSA  Roadrunners ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Tulsa  Golden  Hurricane  vs  UTSA  Roadrunners ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, Arizona  St  Sun  Devils  vs  UCLA  Bruins ,draftkings,over,spreads,4.76,52.38,100
+NCAAB, Arizona  St  Sun  Devils  vs  UCLA  Bruins ,betonlineag,over,spreads,4.76,52.38,100
+NCAAB, Arizona  St  Sun  Devils  vs  UCLA  Bruins ,lowvig,over,spreads,0.88,51.43,104
+NCAAB, Arizona  St  Sun  Devils  vs  UCLA  Bruins ,fanduel,over,spreads,1.33,51.66,-104
+NCAAB, Vanderbilt  Commodores  vs  Auburn  Tigers ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Vanderbilt  Commodores  vs  Auburn  Tigers ,bovada,over,spreads,4.76,52.38,100
+NCAAB, North  Carolina  Tar  Heels  vs  Louisville  Cardinals ,fanduel,over,spreads,1.33,51.66,-104
+NCAAB, Michigan  St  Spartans  vs  Minnesota  Golden  Gophers ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, Michigan  St  Spartans  vs  Minnesota  Golden  Gophers ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Florida  Atlantic  Owls  vs  Wichita  St  Shockers ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, Memphis  Tigers  vs  South  Florida  Bulls ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Winthrop  Eagles  vs  UNC  Asheville  Bulldogs ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, California  Golden  Bears  vs  Washington  Huskies ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, California  Golden  Bears  vs  Washington  Huskies ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Colorado  Buffaloes  vs  Oregon  Ducks ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, Colorado  Buffaloes  vs  Oregon  Ducks ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, San  Francisco  Dons  vs  Loyola  Marymount  Lions ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, San  Francisco  Dons  vs  Loyola  Marymount  Lions ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Army  Knights  vs  Colgate  Raiders ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Boston  Univ.  Terriers  vs  Bucknell  Bison ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Fordham  Rams  vs  Davidson  Wildcats ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, East  Carolina  Pirates  vs  North  Texas  Mean  Green ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Wofford  Terriers  vs  East  Tennessee  St  Buccaneers ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Miami  Hurricanes  vs  Florida  St  Seminoles ,draftkings,over,totals,2.17,52.33,105
+NCAAB, Miami  Hurricanes  vs  Florida  St  Seminoles ,betonlineag,over,totals,3.67,52.35,102
+NCAAB, Miami  Hurricanes  vs  Florida  St  Seminoles ,lowvig,over,totals,2.0,52.0,104
+NCAAB, Fort  Wayne  Mastodons  vs  IUPUI  Jaguars ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Radford  Highlanders  vs  Gardner-Webb  Bulldogs ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Presbyterian  Blue  Hose  vs  High  Point  Panthers ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Holy  Cross  Crusaders  vs  Lafayette  Leopards ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Kentucky  Wildcats  vs  Mississippi  St  Bulldogs ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, LSU  Tigers  vs  Ole  Miss  Rebels ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Rutgers  Scarlet  Knights  vs  Nebraska  Cornhuskers ,lowvig,over,totals,3.02,52.02,102
+NCAAB, Rutgers  Scarlet  Knights  vs  Nebraska  Cornhuskers ,betonlineag,over,totals,4.76,52.38,100
+NCAAB, Oakland  Golden  Grizzlies  vs  Youngstown  St  Penguins ,draftkings,over,totals,2.17,52.33,105
+NCAAB, Oakland  Golden  Grizzlies  vs  Youngstown  St  Penguins ,betonlineag,over,totals,2.17,52.33,105
+NCAAB, Oakland  Golden  Grizzlies  vs  Youngstown  St  Penguins ,lowvig,over,totals,1.23,52.09,106
+NCAAB, Virginia  Cavaliers  vs  Virginia  Tech  Hokies ,draftkings,over,totals,4.76,52.38,100
+NCAAB, Virginia  Cavaliers  vs  Virginia  Tech  Hokies ,betonlineag,over,totals,4.76,52.38,100
+NCAAB, Virginia  Cavaliers  vs  Virginia  Tech  Hokies ,lowvig,over,totals,3.02,52.02,102
+NCAAB, Southern  Illinois  Salukis  vs  Bradley  Braves ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Illinois  St  Redbirds  vs  Drake  Bulldogs ,betonlineag,over,totals,4.22,52.37,101
+NCAAB, Illinois  St  Redbirds  vs  Drake  Bulldogs ,lowvig,over,totals,2.51,52.01,103
+NCAAB, Illinois  St  Redbirds  vs  Drake  Bulldogs ,draftkings,over,totals,2.78,51.9,-102
+NCAAB, Evansville  Purple  Aces  vs  Valparaiso  Beacons ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, UIC  Flames  vs  Murray  St  Racers ,lowvig,over,totals,3.02,52.02,102
+NCAAB, UIC  Flames  vs  Murray  St  Racers ,betonlineag,over,totals,4.76,52.38,100
+NCAAB, Texas  Longhorns  vs  UCF  Knights ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, UAB  Blazers  vs  Tulane  Green  Wave ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Tulsa  Golden  Hurricane  vs  UTSA  Roadrunners ,betonlineag,over,totals,2.78,51.9,-102
+NCAAB, Tulsa  Golden  Hurricane  vs  UTSA  Roadrunners ,lowvig,over,totals,4.08,52.04,100
+NCAAB, Vanderbilt  Commodores  vs  Auburn  Tigers ,draftkings,over,totals,2.17,52.33,105
+NCAAB, Vanderbilt  Commodores  vs  Auburn  Tigers ,lowvig,over,totals,0.77,52.09,107
+NCAAB, Vanderbilt  Commodores  vs  Auburn  Tigers ,betonlineag,over,totals,1.66,52.31,106
+NCAAB, Northwestern  Wildcats  vs  Maryland  Terrapins ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Charleston  Cougars  vs  Towson  Tigers ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, San  Francisco  Dons  vs  Loyola  Marymount  Lions ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Stanford  Cardinal  vs  Washington  St  Cougars ,lowvig,over,totals,0.91,51.2,-103
+NFL, Detroit  Lions  vs  Tampa  Bay  Buccaneers ,lowvig,over,spreads,2.15,51.33,101
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,fanduel,over,spreads,5.2,52.6,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,lowvig,over,spreads,0.16,51.3,105
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,betonlineag,over,spreads,3.76,52.14,-101
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,draftkings,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,betrivers,over,spreads,3.67,52.35,102
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,unibet_us,over,spreads,3.67,52.35,102
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,betmgm,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,bovada,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,williamhill_us,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,superbook,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,betus,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,mybookieag,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,wynnbet,over,spreads,4.76,52.38,100
+NBA, Detroit  Pistons  vs  Minnesota  Timberwolves ,williamhill_us,over,spreads,2.17,52.33,-105
+NBA, Atlanta  Hawks  vs  Orlando  Magic ,draftkings,over,spreads,2.17,52.33,-105
+NBA, Boston  Celtics  vs  San  Antonio  Spurs ,betmgm,over,spreads,2.17,52.33,-105
+NBA, Cleveland  Cavaliers  vs  Milwaukee  Bucks ,fanduel,over,spreads,4.17,53.6,106
+NBA, New  York  Knicks  vs  Houston  Rockets ,fanduel,over,spreads,4.17,53.6,106
+NBA, New  Orleans  Pelicans  vs  Charlotte  Hornets ,lowvig,over,spreads,0.94,50.97,-102
+NBA, Los  Angeles  Lakers  vs  Dallas  Mavericks ,bovada,over,spreads,4.76,52.38,100
+NBA, Los  Angeles  Lakers  vs  Dallas  Mavericks ,lowvig,over,spreads,1.91,51.21,-101
+NBA, Cleveland  Cavaliers  vs  Milwaukee  Bucks ,lowvig,over,totals,1.63,51.32,-102
+NBA, Cleveland  Cavaliers  vs  Milwaukee  Bucks ,pointsbetus,over,totals,1.07,51.77,-105
+NBA, Cleveland  Cavaliers  vs  Milwaukee  Bucks ,williamhill_us,over,totals,2.17,52.33,-105
+NBA, Toronto  Raptors  vs  Miami  Heat ,betmgm,over,totals,2.17,52.33,-105
+NBA, Utah  Jazz  vs  Oklahoma  City  Thunder ,lowvig,over,totals,1.63,51.32,-102
+NCAAB, Army  Knights  vs  Colgate  Raiders ,pointsbetus,over,h2h,0.1,0.1,-100000
+NCAAB, Bradley  Braves  vs  Southern  Illinois  Salukis ,pointsbetus,over,h2h,0.1,0.1,-100000
+NCAAB, Army  Knights  vs  Colgate  Raiders ,fanduel,over,spreads,4.17,53.6,106
+NCAAB, Army  Knights  vs  Colgate  Raiders ,draftkings,over,spreads,6.98,53.49,100
+NCAAB, Army  Knights  vs  Colgate  Raiders ,williamhill_us,over,spreads,4.28,53.41,105
+NCAAB, Appalachian  St  Mountaineers  vs  Georgia  St  Panthers ,fanduel,over,spreads,2.88,52.45,-104
+NCAAB, Appalachian  St  Mountaineers  vs  Georgia  St  Panthers ,betmgm,over,spreads,2.17,52.33,-105
+NCAAB, Appalachian  St  Mountaineers  vs  Georgia  St  Panthers ,draftkings,over,spreads,2.17,52.33,-105
+NCAAB, Appalachian  St  Mountaineers  vs  Georgia  St  Panthers ,pointsbetus,over,spreads,5.29,53.93,105
+NCAAB, Appalachian  St  Mountaineers  vs  Georgia  St  Panthers ,wynnbet,over,spreads,6.98,53.49,100
+NCAAB, Mercer  Bears  vs  Chattanooga  Mocs ,betmgm,over,spreads,2.17,52.33,-105
+NCAAB, Mercer  Bears  vs  Chattanooga  Mocs ,fanduel,over,spreads,2.88,52.45,-104
+NCAAB, UConn  Huskies  vs  Creighton  Bluejays ,draftkings,over,spreads,2.17,52.33,-105
+NCAAB, UConn  Huskies  vs  Creighton  Bluejays ,pointsbetus,over,spreads,2.17,52.33,-105
+NCAAB, UConn  Huskies  vs  Creighton  Bluejays ,betmgm,over,spreads,2.17,52.33,-105
+NCAAB, UConn  Huskies  vs  Creighton  Bluejays ,wynnbet,over,spreads,2.17,52.33,-105
+NCAAB, Fordham  Rams  vs  Davidson  Wildcats ,williamhill_us,over,spreads,2.17,52.33,-105
+NCAAB, Robert  Morris  Colonials  vs  Detroit  Mercy  Titans ,draftkings,over,spreads,2.17,52.33,-105
+NCAAB, Robert  Morris  Colonials  vs  Detroit  Mercy  Titans ,betmgm,over,spreads,2.17,52.33,-105
+NCAAB, East  Carolina  Pirates  vs  North  Texas  Mean  Green ,wynnbet,over,spreads,2.17,52.33,-105
+NCAAB, Wofford  Terriers  vs  East  Tennessee  St  Buccaneers ,fanduel,over,spreads,2.88,52.45,-104
+NCAAB, Wofford  Terriers  vs  East  Tennessee  St  Buccaneers ,wynnbet,over,spreads,6.98,53.49,100
+NCAAB, Fort  Wayne  Mastodons  vs  IUPUI  Jaguars ,draftkings,over,spreads,2.17,52.33,-105
+NCAAB, Fort  Wayne  Mastodons  vs  IUPUI  Jaguars ,betmgm,over,spreads,2.17,52.33,-105
+NCAAB, Radford  Highlanders  vs  Gardner-Webb  Bulldogs ,draftkings,over,spreads,2.17,52.33,-105
+NCAAB, Radford  Highlanders  vs  Gardner-Webb  Bulldogs ,pointsbetus,over,spreads,2.17,52.33,-105
+NCAAB, Presbyterian  Blue  Hose  vs  High  Point  Panthers ,pointsbetus,over,spreads,2.17,52.33,-105
+NCAAB, Holy  Cross  Crusaders  vs  Lafayette  Leopards ,betmgm,over,spreads,2.17,52.33,-105
+NCAAB, Kentucky  Wildcats  vs  Mississippi  St  Bulldogs ,draftkings,over,spreads,2.17,52.33,-105
+NCAAB, Kentucky  Wildcats  vs  Mississippi  St  Bulldogs ,fanduel,over,spreads,0.78,51.86,-106
+NCAAB, Kentucky  Wildcats  vs  Mississippi  St  Bulldogs ,pointsbetus,over,spreads,2.17,52.33,-105
+NCAAB, LSU  Tigers  vs  Ole  Miss  Rebels ,betmgm,over,spreads,2.17,52.33,-105
+NCAAB, Navy  Midshipmen  vs  Lehigh  Mountain  Hawks ,draftkings,over,spreads,2.17,52.33,-105
+NCAAB, Navy  Midshipmen  vs  Lehigh  Mountain  Hawks ,fanduel,over,spreads,6.98,53.49,100
+NCAAB, Navy  Midshipmen  vs  Lehigh  Mountain  Hawks ,betmgm,over,spreads,2.17,52.33,-105
+NCAAB, South  Carolina  Upstate  Spartans  vs  Longwood  Lancers ,draftkings,over,spreads,2.17,52.33,-105
+NCAAB, South  Carolina  Upstate  Spartans  vs  Longwood  Lancers ,pointsbetus,over,spreads,2.17,52.33,-105
+NCAAB, South  Carolina  Upstate  Spartans  vs  Longwood  Lancers ,betmgm,over,spreads,2.17,52.33,-105
+NCAAB, Loyola  (Chi)  Ramblers  vs  Massachusetts  Minutemen ,betmgm,over,spreads,2.17,52.33,-105
+NCAAB, Oakland  Golden  Grizzlies  vs  Youngstown  St  Penguins ,draftkings,over,spreads,2.17,52.33,-105
+NCAAB, Oakland  Golden  Grizzlies  vs  Youngstown  St  Penguins ,pointsbetus,over,spreads,5.29,53.93,105
+NCAAB, St.  Bonaventure  Bonnies  vs  Rhode  Island  Rams ,williamhill_us,over,spreads,2.17,52.33,-105
+NCAAB, UNC  Greensboro  Spartans  vs  The  Citadel  Bulldogs ,fanduel,over,spreads,2.88,52.45,-104
+NCAAB, Virginia  Cavaliers  vs  Virginia  Tech  Hokies ,fanduel,over,spreads,0.78,51.86,-106
+NCAAB, Virginia  Cavaliers  vs  Virginia  Tech  Hokies ,pointsbetus,over,spreads,6.98,53.49,100
+NCAAB, Rutgers  Scarlet  Knights  vs  Nebraska  Cornhuskers ,betmgm,over,spreads,2.17,52.33,-105
+NCAAB, Evansville  Purple  Aces  vs  Valparaiso  Beacons ,fanduel,over,spreads,1.33,51.66,-104
+NCAAB, Texas  State  Bobcats  vs  Louisiana  Ragin'  Cajuns ,lowvig,over,spreads,0.94,50.97,-102
+NCAAB, Texas  State  Bobcats  vs  Louisiana  Ragin'  Cajuns ,betmgm,over,spreads,4.76,52.38,100
+NCAAB, UIC  Flames  vs  Murray  St  Racers ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, UIC  Flames  vs  Murray  St  Racers ,wynnbet,over,spreads,3.76,52.14,-101
+NCAAB, Oklahoma  Sooners  vs  West  Virginia  Mountaineers ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, UAB  Blazers  vs  Tulane  Green  Wave ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, UAB  Blazers  vs  Tulane  Green  Wave ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, Tulsa  Golden  Hurricane  vs  UTSA  Roadrunners ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Tulsa  Golden  Hurricane  vs  UTSA  Roadrunners ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, Southern  Miss  Golden  Eagles  vs  Arkansas  St  Red  Wolves ,fanduel,over,spreads,1.33,51.66,-104
+NCAAB, Southern  Illinois  Salukis  vs  Bradley  Braves ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Arizona  St  Sun  Devils  vs  UCLA  Bruins ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Arizona  St  Sun  Devils  vs  UCLA  Bruins ,fanduel,over,spreads,1.33,51.66,-104
+NCAAB, Vanderbilt  Commodores  vs  Auburn  Tigers ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Belmont  Bruins  vs  Northern  Iowa  Panthers ,fanduel,over,spreads,5.2,52.6,100
+NCAAB, DePaul  Blue  Demons  vs  Providence  Friars ,lowvig,over,spreads,0.94,50.97,-102
+NCAAB, Houston  Cougars  vs  Texas  Tech  Red  Raiders ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Houston  Cougars  vs  Texas  Tech  Red  Raiders ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, North  Carolina  Tar  Heels  vs  Louisville  Cardinals ,fanduel,over,spreads,1.33,51.66,-104
+NCAAB, Michigan  St  Spartans  vs  Minnesota  Golden  Gophers ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Florida  Atlantic  Owls  vs  Wichita  St  Shockers ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, Memphis  Tigers  vs  South  Florida  Bulls ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Winthrop  Eagles  vs  UNC  Asheville  Bulldogs ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, California  Golden  Bears  vs  Washington  Huskies ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, California  Golden  Bears  vs  Washington  Huskies ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Weber  State  Wildcats  vs  Eastern  Washington  Eagles ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, Grand  Canyon  Antelopes  vs  Utah  Valley  Wolverines ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, CSU  Bakersfield  Roadrunners  vs  UC  Riverside  Highlanders ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, CSU  Fullerton  Titans  vs  UC  Davis  Aggies ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, CSU  Fullerton  Titans  vs  UC  Davis  Aggies ,betonlineag,over,spreads,4.76,52.38,100
+NCAAB, CSU  Fullerton  Titans  vs  UC  Davis  Aggies ,lowvig,over,spreads,0.88,51.43,104
+NCAAB, CSU  Northridge  Matadors  vs  UC  Santa  Barbara  Gauchos ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Long  Beach  St  49ers  vs  Hawai'i  Rainbow  Warriors ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Pacific  Tigers  vs  Santa  Clara  Broncos ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, San  Francisco  Dons  vs  Loyola  Marymount  Lions ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, Army  Knights  vs  Colgate  Raiders ,betmgm,over,totals,6.98,53.49,100
+NCAAB, Appalachian  St  Mountaineers  vs  Georgia  St  Panthers ,fanduel,over,totals,5.0,53.02,-102
+NCAAB, Appalachian  St  Mountaineers  vs  Georgia  St  Panthers ,betmgm,over,totals,2.17,52.33,-105
+NCAAB, Appalachian  St  Mountaineers  vs  Georgia  St  Panthers ,draftkings,over,totals,2.17,52.33,-105
+NCAAB, Boston  Univ.  Terriers  vs  Bucknell  Bison ,draftkings,over,totals,2.17,52.33,-105
+NCAAB, Boston  Univ.  Terriers  vs  Bucknell  Bison ,pointsbetus,over,totals,6.98,53.49,100
+NCAAB, Wofford  Terriers  vs  East  Tennessee  St  Buccaneers ,draftkings,over,totals,2.17,52.33,-105
+NCAAB, Wofford  Terriers  vs  East  Tennessee  St  Buccaneers ,pointsbetus,over,totals,6.98,53.49,100
+NCAAB, Kentucky  Wildcats  vs  Mississippi  St  Bulldogs ,fanduel,over,totals,0.36,51.64,-106
+NCAAB, Kentucky  Wildcats  vs  Mississippi  St  Bulldogs ,betmgm,over,totals,2.17,52.33,-105
+NCAAB, LSU  Tigers  vs  Ole  Miss  Rebels ,draftkings,over,totals,2.17,52.33,-105
+NCAAB, LSU  Tigers  vs  Ole  Miss  Rebels ,betmgm,over,totals,2.17,52.33,-105
+NCAAB, Navy  Midshipmen  vs  Lehigh  Mountain  Hawks ,fanduel,over,totals,0.36,51.64,-106
+NCAAB, South  Carolina  Upstate  Spartans  vs  Longwood  Lancers ,fanduel,over,totals,0.36,51.64,-106
+NCAAB, St.  Bonaventure  Bonnies  vs  Rhode  Island  Rams ,betmgm,over,totals,2.17,52.33,-105
+NCAAB, Virginia  Cavaliers  vs  Virginia  Tech  Hokies ,betmgm,over,totals,2.17,52.33,-105
+NCAAB, Evansville  Purple  Aces  vs  Valparaiso  Beacons ,draftkings,over,totals,2.78,51.9,-102
+NCAAB, Evansville  Purple  Aces  vs  Valparaiso  Beacons ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Oklahoma  Sooners  vs  West  Virginia  Mountaineers ,lowvig,over,totals,1.87,51.44,-102
+NCAAB, Oklahoma  Sooners  vs  West  Virginia  Mountaineers ,betonlineag,over,totals,0.88,51.43,-104
+NCAAB, UAB  Blazers  vs  Tulane  Green  Wave ,draftkings,over,totals,2.17,52.33,105
+NCAAB, UAB  Blazers  vs  Tulane  Green  Wave ,betonlineag,over,totals,2.17,52.33,105
+NCAAB, UAB  Blazers  vs  Tulane  Green  Wave ,lowvig,over,totals,1.23,52.09,106
+NCAAB, Southern  Illinois  Salukis  vs  Bradley  Braves ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Illinois  St  Redbirds  vs  Drake  Bulldogs ,betonlineag,over,totals,4.22,52.37,101
+NCAAB, Illinois  St  Redbirds  vs  Drake  Bulldogs ,lowvig,over,totals,2.51,52.01,103
+NCAAB, Illinois  St  Redbirds  vs  Drake  Bulldogs ,draftkings,over,totals,4.76,52.38,100
+NCAAB, Vanderbilt  Commodores  vs  Auburn  Tigers ,draftkings,over,totals,2.17,52.33,105
+NCAAB, Vanderbilt  Commodores  vs  Auburn  Tigers ,lowvig,over,totals,1.23,52.09,106
+NCAAB, Vanderbilt  Commodores  vs  Auburn  Tigers ,betonlineag,over,totals,2.17,52.33,105
+NCAAB, Charleston  Cougars  vs  Towson  Tigers ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, CSU  Northridge  Matadors  vs  UC  Santa  Barbara  Gauchos ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, UC  Irvine  Anteaters  vs  UC  San  Diego  Tritons ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, San  Francisco  Dons  vs  Loyola  Marymount  Lions ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Stanford  Cardinal  vs  Washington  St  Cougars ,lowvig,over,totals,0.91,51.2,-103
+NFL, Detroit  Lions  vs  Tampa  Bay  Buccaneers ,lowvig,over,spreads,1.63,51.32,102
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,fanduel,over,spreads,5.2,52.6,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,lowvig,over,spreads,0.16,51.3,105
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,betonlineag,over,spreads,3.76,52.14,-101
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,draftkings,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,betrivers,over,spreads,3.67,52.35,102
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,unibet_us,over,spreads,3.67,52.35,102
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,betmgm,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,bovada,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,williamhill_us,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,superbook,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,betus,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,mybookieag,over,spreads,4.76,52.38,100
+NFL, Buffalo  Bills  vs  Kansas  City  Chiefs ,wynnbet,over,spreads,4.76,52.38,100
+NBA, New  Orleans  Pelicans  vs  Charlotte  Hornets ,draftkings,over,spreads,6.98,53.49,100
+NBA, New  Orleans  Pelicans  vs  Charlotte  Hornets ,pointsbetus,over,spreads,5.88,52.94,100
+NBA, New  Orleans  Pelicans  vs  Charlotte  Hornets ,williamhill_us,over,spreads,2.17,52.33,-105
+NBA, New  Orleans  Pelicans  vs  Charlotte  Hornets ,bovada,over,spreads,2.17,52.33,-105
+NBA, Los  Angeles  Lakers  vs  Dallas  Mavericks ,pointsbetus,over,spreads,1.07,51.77,-105
+NBA, Los  Angeles  Lakers  vs  Dallas  Mavericks ,mybookieag,over,spreads,4.76,52.38,100
+NBA, Portland  Trail  Blazers  vs  Brooklyn  Nets ,pointsbetus,over,spreads,1.07,51.77,-105
+NBA, Portland  Trail  Blazers  vs  Brooklyn  Nets ,fanduel,over,spreads,3.17,53.57,108
+NBA, New  Orleans  Pelicans  vs  Charlotte  Hornets ,draftkings,over,totals,6.98,53.49,100
+NBA, Los  Angeles  Lakers  vs  Dallas  Mavericks ,williamhill_us,over,totals,2.17,52.33,-105
+NBA, Los  Angeles  Lakers  vs  Dallas  Mavericks ,wynnbet,over,totals,2.17,52.33,-105
+NBA, Portland  Trail  Blazers  vs  Brooklyn  Nets ,betmgm,over,totals,2.17,52.33,-105
+NCAAB, DePaul  Blue  Demons  vs  Providence  Friars ,wynnbet,over,h2h,0.1,0.1,-100000
+NCAAB, Arizona  St  Sun  Devils  vs  UCLA  Bruins ,draftkings,over,spreads,2.17,52.33,-105
+NCAAB, Arizona  St  Sun  Devils  vs  UCLA  Bruins ,williamhill_us,over,spreads,2.17,52.33,-105
+NCAAB, Arizona  St  Sun  Devils  vs  UCLA  Bruins ,betmgm,over,spreads,2.17,52.33,-105
+NCAAB, Arizona  St  Sun  Devils  vs  UCLA  Bruins ,pointsbetus,over,spreads,2.17,52.33,-105
+NCAAB, Arizona  St  Sun  Devils  vs  UCLA  Bruins ,wynnbet,over,spreads,2.17,52.33,-105
+NCAAB, Vanderbilt  Commodores  vs  Auburn  Tigers ,betmgm,over,spreads,2.17,52.33,-105
+NCAAB, Houston  Cougars  vs  Texas  Tech  Red  Raiders ,draftkings,over,spreads,2.17,52.33,-105
+NCAAB, North  Carolina  Tar  Heels  vs  Louisville  Cardinals ,williamhill_us,over,spreads,2.17,52.33,-105
+NCAAB, North  Carolina  Tar  Heels  vs  Louisville  Cardinals ,betmgm,over,spreads,2.17,52.33,-105
+NCAAB, Northwestern  Wildcats  vs  Maryland  Terrapins ,williamhill_us,over,spreads,2.17,52.33,-105
+NCAAB, Northwestern  Wildcats  vs  Maryland  Terrapins ,pointsbetus,over,spreads,2.17,52.33,-105
+NCAAB, DePaul  Blue  Demons  vs  Providence  Friars ,williamhill_us,over,spreads,2.17,52.33,-105
+NCAAB, Belmont  Bruins  vs  Northern  Iowa  Panthers ,betmgm,over,spreads,2.17,52.33,-105
+NCAAB, Arizona  Wildcats  vs  USC  Trojans ,betmgm,over,spreads,2.17,52.33,-105
+NCAAB, Albany  Great  Danes  vs  UMass  Lowell  River  Hawks ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Charleston  Cougars  vs  Towson  Tigers ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Charleston  Cougars  vs  Towson  Tigers ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, Florida  Atlantic  Owls  vs  Wichita  St  Shockers ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, Liberty  Flames  vs  Florida  Int'l  Golden  Panthers ,unibet_us,over,spreads,2.51,52.01,-103
+NCAAB, Liberty  Flames  vs  Florida  Int'l  Golden  Panthers ,betrivers,over,spreads,2.51,52.01,-103
+NCAAB, Wright  St  Raiders  vs  Green  Bay  Phoenix ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Jacksonville  Dolphins  vs  Queens  University  Royals ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Winthrop  Eagles  vs  UNC  Asheville  Bulldogs ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Morehead  St  Eagles  vs  Tenn-Martin  Skyhawks ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Stephen  F.  Austin  Lumberjacks  vs  Seattle  Redhawks ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Austin  Peay  Governors  vs  North  Alabama  Lions ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Lipscomb  Bisons  vs  Central  Arkansas  Bears ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, North  Dakota  St  Bison  vs  Denver  Pioneers ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, South  Dakota  Coyotes  vs  St.  Thomas  (MN)  Tommies ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Tennessee  St  Tigers  vs  Tennessee  Tech  Golden  Eagles ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, California  Golden  Bears  vs  Washington  Huskies ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, California  Golden  Bears  vs  Washington  Huskies ,lowvig,over,spreads,1.91,51.21,-101
+NCAAB, Weber  State  Wildcats  vs  Eastern  Washington  Eagles ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, Grand  Canyon  Antelopes  vs  Utah  Valley  Wolverines ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, CSU  Bakersfield  Roadrunners  vs  UC  Riverside  Highlanders ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, CSU  Fullerton  Titans  vs  UC  Davis  Aggies ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, Pacific  Tigers  vs  Santa  Clara  Broncos ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, UC  Irvine  Anteaters  vs  UC  San  Diego  Tritons ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, San  Francisco  Dons  vs  Loyola  Marymount  Lions ,fanduel,over,spreads,3.24,52.13,-102
+NCAAB, Arizona  St  Sun  Devils  vs  UCLA  Bruins ,williamhill_us,over,totals,2.17,52.33,-105
+NCAAB, Vanderbilt  Commodores  vs  Auburn  Tigers ,pointsbetus,over,totals,6.98,53.49,100
+NCAAB, Houston  Cougars  vs  Texas  Tech  Red  Raiders ,pointsbetus,over,totals,2.17,52.33,-105
+NCAAB, North  Carolina  Tar  Heels  vs  Louisville  Cardinals ,williamhill_us,over,totals,2.17,52.33,-105
+NCAAB, North  Carolina  Tar  Heels  vs  Louisville  Cardinals ,fanduel,over,totals,0.78,51.86,-106
+NCAAB, North  Carolina  Tar  Heels  vs  Louisville  Cardinals ,pointsbetus,over,totals,6.98,53.49,100
+NCAAB, Northwestern  Wildcats  vs  Maryland  Terrapins ,pointsbetus,over,totals,2.17,52.33,-105
+NCAAB, DePaul  Blue  Demons  vs  Providence  Friars ,betmgm,over,totals,2.17,52.33,-105
+NCAAB, Belmont  Bruins  vs  Northern  Iowa  Panthers ,pointsbetus,over,totals,6.98,53.49,100
+NCAAB, Arizona  Wildcats  vs  USC  Trojans ,betonlineag,over,totals,4.76,52.38,100
+NCAAB, San  Diego  St  Aztecs  vs  Nevada  Wolf  Pack ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Albany  Great  Danes  vs  UMass  Lowell  River  Hawks ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, William  &  Mary  Tribe  vs  Campbell  Fighting  Camels ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Charleston  Cougars  vs  Towson  Tigers ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Liberty  Flames  vs  Florida  Int'l  Golden  Panthers ,betonlineag,over,totals,3.67,52.35,102
+NCAAB, Liberty  Flames  vs  Florida  Int'l  Golden  Panthers ,lowvig,over,totals,2.0,52.0,104
+NCAAB, Jacksonville  Dolphins  vs  Queens  University  Royals ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, UMBC  Retrievers  vs  Maine  Black  Bears ,lowvig,over,totals,3.02,52.02,102
+NCAAB, UMBC  Retrievers  vs  Maine  Black  Bears ,betonlineag,over,totals,4.76,52.38,100
+NCAAB, NJIT  Highlanders  vs  New  Hampshire  Wildcats ,lowvig,over,totals,3.02,52.02,102
+NCAAB, NJIT  Highlanders  vs  New  Hampshire  Wildcats ,betonlineag,over,totals,4.76,52.38,100
+NCAAB, Morehead  St  Eagles  vs  Tenn-Martin  Skyhawks ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Lipscomb  Bisons  vs  Central  Arkansas  Bears ,lowvig,over,totals,3.02,52.02,102
+NCAAB, Lipscomb  Bisons  vs  Central  Arkansas  Bears ,betonlineag,over,totals,4.76,52.38,100
+NCAAB, North  Dakota  Fighting  Hawks  vs  Oral  Roberts  Golden  Eagles ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, South  Dakota  St  Jackrabbits  vs  Omaha  Mavericks ,betonlineag,over,totals,4.76,52.38,100
+NCAAB, South  Dakota  St  Jackrabbits  vs  Omaha  Mavericks ,lowvig,over,totals,3.02,52.02,102
+NCAAB, CSU  Northridge  Matadors  vs  UC  Santa  Barbara  Gauchos ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, UC  Irvine  Anteaters  vs  UC  San  Diego  Tritons ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, San  Francisco  Dons  vs  Loyola  Marymount  Lions ,lowvig,over,totals,0.91,51.2,-103
+NCAAB, Stanford  Cardinal  vs  Washington  St  Cougars ,lowvig,over,totals,0.91,51.2,-103
