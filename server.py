@@ -1,12 +1,23 @@
 from flask import Flask, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
 import time
-from scripts.main import run_script
+from scripts.positiveev import run_script
 import os
 import psycopg2
 
 
 app = Flask(__name__)
+
+#New main flow:
+# - Import full bet list
+# - Save it to database
+# - Call the data in rotating order to the following:
+#   - Arbitrage
+#   - Positive EV
+#   - Scanner
+# - Save the processed information to separate database tables
+# - Sort for Arbitrage and Positive EV
+# - Return values upon called from server.py
 
 
 def update_bet_data():
