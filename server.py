@@ -2,6 +2,7 @@ from flask import Flask, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
 import time
 from scripts.positiveev import run_script
+from scripts.data_import import get_data
 import os
 import psycopg2
 
@@ -45,6 +46,28 @@ def update_bet_data():
     print("The script was run at: ", time.strftime("%Y-%m-%d %H:%M:%S"))
 
 
+def pull_all_data_games():
+    """
+    This function is intended to assist the /pull-data endpoint.
+    :return:
+    """
+
+    dbconn = psycopg2.connect(
+        dbname='postgres',
+        user='postgres',
+        password='admin',
+        host='localhost',
+        port='5432',
+    )
+
+    cur = dbconn.cursor()
+
+    get_data(dbconn, cur)
+
+    cur.close()
+    dbconn.close()
+
+
 # Your function that performs the task
 def run_task():
     # Perform the task here (e.g., running your Python script)
@@ -56,6 +79,13 @@ def run_task():
 def trigger_task():
     update_bet_data()
     return jsonify({'message': 'Task triggered manually'})
+
+
+#Endpoint to pull data manually
+@app.route('/pull-data', methods=['GET'])
+def pull_data():
+    pull_all_data_games()
+    return jsonify({'message': 'Task has been triggered.'})
 
 
 # Initializing scheduler for a 15-minute interval
