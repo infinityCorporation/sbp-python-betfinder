@@ -527,12 +527,12 @@ def run_script(connection, cur):
 
 
 plt.scatter(vigList, betList)
-plt.show()
+# plt.show()
 
 plt.scatter(totalVig, totalEvOver)
 plt.scatter(totalVig, totalEvUnder)
 plt.axhline(y=0, color='red', linestyle='--')
-plt.show()
+# plt.show()
 
 betList.sort()
 vigList.sort()

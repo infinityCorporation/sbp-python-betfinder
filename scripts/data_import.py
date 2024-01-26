@@ -5,10 +5,14 @@
 #The idea of this file is keep the costs of requests down the number of calculations
 #computed by the program to a reasonable level, between: 10,000,000 - 200,000,000 / day.
 
+# Lines_data needs a commence time for lines to be cleared once the event has finished
+
 import http.client as client
 import uuid
 from datetime import datetime, timezone
 import json
+
+from scripts.dbmanager import check_bet_time_v2
 
 apiKey = "098b369ca52dc641b2bea6c901c24887"
 host = "api.the-odds-api.com"
@@ -16,8 +20,10 @@ host = "api.the-odds-api.com"
 conn = client.HTTPSConnection(host)
 
 # Add the sports and market arrays
-sports = ['americanfootball_nfl', 'americanfootball_ncaaf', 'basketball_nba', 'basketball_ncaab']
-betting_markets = ['h2h', 'spreads', 'totals']
+# sports = ['americanfootball_nfl', 'americanfootball_ncaaf', 'basketball_nba', 'basketball_ncaab']
+# betting_markets = ['h2h', 'spreads', 'totals']
+sports = ['americanfootball_nfl']
+betting_markets = ['h2h']
 current_utc_time = datetime.now(timezone.utc)
 date_time = current_utc_time.strftime('%Y-%m-%dT%H:%M:%SZ')
 
@@ -34,6 +40,26 @@ all_lines = []
 #           - [Array] Outcomes (current odds) (z)
 #               - [Object] Team Name and Odds
 
+
+# The start method should be as follows:
+# - Check the timing of existing bets
+# - Pull new bets
+#   - Check all events and then the corresponding lines against existing bets
+# - Send confirmation to other processors that import is complete
+
+# Here the issue is that with the split of lines and events, the event may not change while the lines do change. Here,
+# consider updating lines instead of chagning the entire row and uid. This only needs to happen on lines that are
+# updated for a current event
+
+def clean_up_prep(cursor):
+    """
+    This functions purpose is to clean up the database and prep it for another data pull. The idea is to clear any
+    events that have ended, been cancelled, or duplicates.
+    :param cursor:
+    :return:
+    """
+    check_bet_time_v2(cursor, "lines_data")
+    check_bet_time_v2(cursor, "all_data")
 
 def games_loop_call(parsed_url):
     """
@@ -73,7 +99,8 @@ def games_loop_call(parsed_url):
                     'uid': line_id,
                     'key': key,
                     'last_update': last_update,
-                    'outcomes': outcomes
+                    'commence_time': commence_time,
+                    'outcomes': outcomes,
                 }
                 all_lines.append(line_object)
 
@@ -99,10 +126,11 @@ def games_loop_call(parsed_url):
         print(event_object)
         all_markets.append(event_object)
 
-
 # Save to its own table - create table named all_data
 # - add columns later today...
 def get_data(connection, cur):
+    clean_up_prep(cur)
+
     for s in sports:
         for m in betting_markets:
             url = "/v4/sports/" + s + "/odds/?regions=us&oddsFormat=american&markets=" + m + "&apiKey=" + apiKey
@@ -138,14 +166,15 @@ def get_data(connection, cur):
         print("A row was successfully added to: all_data")
 
     for y in all_lines:
-        sql = "INSERT INTO lines_data (uid, key, last_update, outcomes) VALUES (%s, %s, %s, %s::json[])"
+        sql = "INSERT INTO lines_data (uid, key, last_update, outcomes, commence_time) VALUES (%s, %s, %s, %s::json[], %s)"
 
         uid = y['uid']
         key = y['key']
         last_update = y['last_update']
+        commence_time = y['commence_time']
         outcomes = [json.dumps(y['outcomes'])]
 
-        data = (uid, key, last_update, outcomes)
+        data = (uid, key, last_update, outcomes, commence_time)
 
         cur.execute(sql, data)
         connection.commit()

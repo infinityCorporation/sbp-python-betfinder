@@ -91,10 +91,46 @@ def check_bet_time(cursor):
         print("An error occurred:", e)
 
 
-def test_looping_function(cursor):
+def check_bet_time_v2(cursor, database_table):
     """
-    This is a function to test looping through the postgres database.
+    This is a new version of the previous check_bet_time management function. It has the same functionality but an all
+    new looping algorithm that should be more stable and throw less errors.
     :param cursor:
+    :param database_table:
     :return:
     """
+    expired = []
+
+    get_all = "SELECT * FROM " + database_table + ";"
+    cursor.execute(get_all)
+
+    results = cursor.fetchall()
+    print(results)
+
+    for row in results:
+        print("Checking timing of event... ")
+
+        if database_table == "lines_data":
+            commence_time = row[4]
+        elif database_table == "all_data":
+            commence_time = row[2]
+
+        commence_value = datetime.strptime(commence_time, '%Y-%m-%dT%H:%M:%SZ')
+        current_value = datetime.strptime(date_time, '%Y-%m-%dT%H:%M:%SZ')
+
+        # Remember that this is not based on the update_time stored in the database but rather
+        # it is based on the actual current time value that python pulls.
+        latest = max((commence_value, current_value))
+        print(latest)
+
+        if latest == current_value:
+            print(" - - - Found an Expired Event - - - ")
+            expired.append(row[0])
+        elif latest == commence_value:
+            print("This event's time value checks out. Moving onto the next ->")
+
+    for y in expired:
+        delete_all = "DELETE * FROM " + database_table + " WHERE uid = %s;"
+        cursor.execute(delete_all, y)
+        print("A row may have been deleted... UID: " + y)
 
