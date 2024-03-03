@@ -122,6 +122,7 @@ def check_bet_time_v2(cursor, database_table):
         # it is based on the actual current time value that python pulls.
         latest = max((commence_value, current_value))
         print(latest)
+        print(row)
 
         if latest == current_value:
             print(" - - - Found an Expired Event - - - ")
@@ -129,8 +130,16 @@ def check_bet_time_v2(cursor, database_table):
         elif latest == commence_value:
             print("This event's time value checks out. Moving onto the next ->")
 
+    print(expired)
+
     for y in expired:
-        delete_all = "DELETE * FROM " + database_table + " WHERE uid = %s;"
-        cursor.execute(delete_all, y)
-        print("A row may have been deleted... UID: " + y)
+        print(y)
+        if database_table == "lines_data":
+            delete_all = "DELETE FROM lines_data WHERE uid LIKE %s;"
+            cursor.execute(delete_all, (y,))
+            print("A lines row may have been deleted... UID: " + y)
+        elif database_table == "all_data":
+            delete_all = "DELETE FROM all_data WHERE uid LIKE %s;"
+            cursor.execute(delete_all, (y,))
+            print("A data row may have been deleted... UID: " + y)
 

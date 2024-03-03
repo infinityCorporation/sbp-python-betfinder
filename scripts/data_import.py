@@ -13,6 +13,7 @@ from datetime import datetime, timezone
 import json
 
 from scripts.dbmanager import check_bet_time_v2
+from scripts.utilities import pull_event_lines
 
 apiKey = "098b369ca52dc641b2bea6c901c24887"
 host = "api.the-odds-api.com"
@@ -20,10 +21,10 @@ host = "api.the-odds-api.com"
 conn = client.HTTPSConnection(host)
 
 # Add the sports and market arrays
-# sports = ['americanfootball_nfl', 'americanfootball_ncaaf', 'basketball_nba', 'basketball_ncaab']
-# betting_markets = ['h2h', 'spreads', 'totals']
-sports = ['americanfootball_nfl']
-betting_markets = ['h2h']
+sports = ['americanfootball_nfl', 'americanfootball_ncaaf', 'basketball_nba', 'basketball_ncaab']
+betting_markets = ['h2h', 'spreads', 'totals']
+# sports = ['basketball_nba']
+# betting_markets = ['h2h']
 current_utc_time = datetime.now(timezone.utc)
 date_time = current_utc_time.strftime('%Y-%m-%dT%H:%M:%SZ')
 
@@ -47,9 +48,6 @@ all_lines = []
 #   - Check all events and then the corresponding lines against existing bets
 # - Send confirmation to other processors that import is complete
 
-# Here the issue is that with the split of lines and events, the event may not change while the lines do change. Here,
-# consider updating lines instead of chagning the entire row and uid. This only needs to happen on lines that are
-# updated for a current event
 
 def clean_up_prep(cursor):
     """
@@ -61,10 +59,11 @@ def clean_up_prep(cursor):
     check_bet_time_v2(cursor, "lines_data")
     check_bet_time_v2(cursor, "all_data")
 
+
 def games_loop_call(parsed_url):
     """
-    The loop pull all necessary objects from the API and stores them in the
-    database table all_data_games
+    This function takes in the raw data from the API, but doesn't actually pull it, and sorts it into an array that can
+    actually be used in the program.
     :param parsed_url:
     :return:
     """
@@ -88,8 +87,8 @@ def games_loop_call(parsed_url):
             lines = id_creator
 
             for y in x['markets']:
+                #This means that the line linked in the event object is the same as the line linked in the lines data
                 line_id = id_creator
-                print(lines + " and " + line_id)
 
                 key = y['key']
                 last_update = y['last_update']
@@ -126,11 +125,22 @@ def games_loop_call(parsed_url):
         print(event_object)
         all_markets.append(event_object)
 
-# Save to its own table - create table named all_data
-# - add columns later today...
-def get_data(connection, cur):
-    clean_up_prep(cur)
 
+def get_data(connection, cur):
+    """
+    This function actually makes the http calls to the API to get the data. It first calls a database clean up, then
+    calls the data, then passes it to games_loop_call to format, then it checks each event in the all_market array for
+    duplicates, then it deletes duplicate events and lines, then it adds the event to the database table.
+    :param connection:
+    :param cur:
+    :return:
+    """
+
+    clean_up_prep(cur)
+    connection.commit()
+    print("Clean up complete...")
+
+    # This grabs all the lines from the api and pushes them to the all_markets array
     for s in sports:
         for m in betting_markets:
             url = "/v4/sports/" + s + "/odds/?regions=us&oddsFormat=american&markets=" + m + "&apiKey=" + apiKey
@@ -142,29 +152,52 @@ def get_data(connection, cur):
 
             games_loop_call(parsed)
 
-            print(all_markets)
+            print("all_markets Array: ", all_markets)
 
     for x in all_markets:
-        sql = ("INSERT INTO all_data (uid, event, commence_time, update_time, home_team, away_team, sport_key, "
-               "sport_title, markets) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s::json[])")
-        uid = x['uid']
-        event = x["event"]
-        commence_time = x['commence_time']
-        update_time = x['update_time']
-        home_team = x['home_team']
-        away_team = x['away_team']
-        sport_key = x['sport_key']
-        sport_title = x['sport_name']
         markets = [json.dumps(x['markets'])]
+        duplicate_exists = False
 
-        print(markets)
-        data = (uid, event, commence_time, update_time, home_team, away_team, sport_key, sport_title, markets)
+        # If a duplicate exists, delete the old one and the olds ones lines and then insert the new one and its lines.
+        # It should honestly be as simple as that.
 
-        cur.execute(sql, data)
-        connection.commit()
+        # Rebuilt duplicate check
+        # Check for a value in all data table that matches our value in all_market array
+        sql_check = ("SELECT * FROM all_data WHERE event = %s AND commence_time = %s AND home_team"
+                     "= %s AND away_team = %s AND sport_key = %s AND sport_title = %s")
+        check_data = (x["event"], x['commence_time'], x['home_team'], x['away_team'], x['sport_key'], x['sport_name'])
+        cur.execute(sql_check, check_data)
 
-        print("A row was successfully added to: all_data")
+        # Get the first result
+        check_result = cur.fetchone()
+        print("Check result is: ", check_result)
 
+        # Check if the result exists
+        if check_result:
+            print("Duplicate Event: ", check_result)
+            delete_array = pull_event_lines(check_result)
+
+            # Run another for loop to delete all the lines, this step could be streamlined if working
+            for line in delete_array:
+                delete_line_sql = "DELETE from lines_data WHERE uid = %s"
+                cur.execute(delete_line_sql, (line,))
+                print("Line Deleted: ", line)
+
+            # Finally, delete the line and move the cursor.
+            print("Event Deleted: ", check_result[0])
+            delete_event_sql = ("DELETE FROM all_data WHERE uid = %s")
+            cur.execute(delete_event_sql, (check_result[0],))
+
+        # Add the new event regardless of any of the above stuff
+        add_new_event_sql = ("INSERT INTO all_data (uid, event, commence_time, update_time, home_team, away_team, "
+                             "sport_key, sport_title, markets) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s::json[])")
+        insert_data = (x['uid'], x["event"], x['commence_time'], x['update_time'], x['home_team'], x['away_team'],
+                       x['sport_key'], x['sport_name'], markets)
+        cur.execute(add_new_event_sql, insert_data)
+        print("Event Added: ", x['uid'])
+
+    # Here, the lines are inserted with no duplication check. The duplication check should be caught by the previous
+    # check
     for y in all_lines:
         sql = "INSERT INTO lines_data (uid, key, last_update, outcomes, commence_time) VALUES (%s, %s, %s, %s::json[], %s)"
 
@@ -179,4 +212,4 @@ def get_data(connection, cur):
         cur.execute(sql, data)
         connection.commit()
 
-        print("Row was successfully added to: lines_data")
+        print("Line Added: ", uid)
