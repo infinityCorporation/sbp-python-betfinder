@@ -3,6 +3,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 import time
 from scripts.positiveev import run_script
 from scripts.data_import import get_data
+from scripts.arbitrage import arbitrage_main
 import os
 import psycopg2
 
@@ -68,24 +69,70 @@ def pull_all_data_games():
     dbconn.close()
 
 
+def main_stack():
+    dbconn = psycopg2.connect(
+        dbname='postgres',
+        user='postgres',
+        password='admin',
+        host='localhost',
+        port='5432',
+    )
+
+    cur = dbconn.cursor()
+
+    get_data(dbconn, cur)
+    arbitrage_main(dbconn, cur)
+
+    cur.close()
+    dbconn.close()
+
+
+def arbitrage_call():
+    dbconn = psycopg2.connect(
+        dbname='postgres',
+        user='postgres',
+        password='admin',
+        host='localhost',
+        port='5432',
+    )
+
+    cur = dbconn.cursor()
+
+    arbitrage_main(dbconn, cur)
+
+    cur.close()
+    dbconn.close()
+
+
 # Your function that performs the task
 def run_task():
     # Perform the task here (e.g., running your Python script)
     print("Task running at:", time.strftime("%Y-%m-%d %H:%M:%S"))
 
 
-# Endpoint to trigger the task manually
+# Endpoints
 @app.route('/trigger-task', methods=['GET'])
 def trigger_task():
     update_bet_data()
     return jsonify({'message': 'Task triggered manually'})
 
 
-#Endpoint to pull data manually
 @app.route('/pull-data', methods=['GET'])
 def pull_data():
     pull_all_data_games()
     return jsonify({'message': 'Task has been triggered.'})
+
+
+@app.route('/run-stack', methods=['GET'])
+def run_full_stack():
+    main_stack()
+    return jsonify({'message': 'The Main Stack has finished running.'})
+
+
+@app.route('/arb-test', methods=['GET'])
+def run_arbitrage():
+    arbitrage_call()
+    return jsonify({'message': 'The arbitrage test has finished running.'})
 
 
 # Initializing scheduler for a 15-minute interval

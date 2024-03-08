@@ -1,12 +1,3 @@
-#This is the file for the main import loop for the bet data values. This will pull
-#the values and push them to a holding database. From that database or table, the
-#values can be pulled.
-
-#The idea of this file is keep the costs of requests down the number of calculations
-#computed by the program to a reasonable level, between: 10,000,000 - 200,000,000 / day.
-
-# Lines_data needs a commence time for lines to be cleared once the event has finished
-
 import http.client as client
 import uuid
 from datetime import datetime, timezone
@@ -21,9 +12,10 @@ host = "api.the-odds-api.com"
 conn = client.HTTPSConnection(host)
 
 # Add the sports and market arrays
-sports = ['americanfootball_nfl', 'americanfootball_ncaaf', 'basketball_nba', 'basketball_ncaab']
+sports = ['americanfootball_nfl', 'americanfootball_ncaaf', 'basketball_nba', 'basketball_ncaab', 'baseball_mlb',
+          'mma_mixed_martial_arts']
 betting_markets = ['h2h', 'spreads', 'totals']
-# sports = ['basketball_nba']
+# sports = ['mma_mixed_martial_arts']
 # betting_markets = ['h2h']
 current_utc_time = datetime.now(timezone.utc)
 date_time = current_utc_time.strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -100,6 +92,7 @@ def games_loop_call(parsed_url):
                     'last_update': last_update,
                     'commence_time': commence_time,
                     'outcomes': outcomes,
+                    'book': book,
                 }
                 all_lines.append(line_object)
 
@@ -199,17 +192,13 @@ def get_data(connection, cur):
     # Here, the lines are inserted with no duplication check. The duplication check should be caught by the previous
     # check
     for y in all_lines:
-        sql = "INSERT INTO lines_data (uid, key, last_update, outcomes, commence_time) VALUES (%s, %s, %s, %s::json[], %s)"
+        sql = ("INSERT INTO lines_data (uid, key, last_update, outcomes, commence_time, book) VALUES "
+               "(%s, %s, %s, %s::json[], %s, %s)")
 
-        uid = y['uid']
-        key = y['key']
-        last_update = y['last_update']
-        commence_time = y['commence_time']
         outcomes = [json.dumps(y['outcomes'])]
 
-        data = (uid, key, last_update, outcomes, commence_time)
+        data = (y['uid'], y['key'], y['last_update'], outcomes, y['commence_time'], y['book'])
 
         cur.execute(sql, data)
-        connection.commit()
 
-        print("Line Added: ", uid)
+    connection.commit()
