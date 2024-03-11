@@ -1,5 +1,5 @@
 # This is the arbitrage file for the calculations and the returning the values to the arbitrage values. The general
-# math seems pretty simple the main thing here is being able to work with the new lines data manamgement system.
+# math seems pretty simple the main thing here is being able to work with the new lines data management system.
 
 # Arbitrage still needs:
 #   - Bet sizing in terms of #'s
@@ -7,6 +7,7 @@
 
 from scripts.utilities import pull_event_lines
 import uuid
+
 
 def line_manager(cur):
     """
@@ -23,7 +24,7 @@ def line_manager(cur):
 
     all_array = cur.fetchall()
 
-    # New plan, we are now creating an array of arrays. The uid of the event and all the line uid's
+    # New plan, we are now creating an array of arrays. The uid of the event and all the line UIDs
 
     for event in all_array:
 
@@ -89,6 +90,22 @@ def calculate_arbitrage(positive_odds, negative_odds):
     return arbitrage_percentage
 
 
+def calculate_arbitrage_stake(positive_odds, negative_odds):
+    """
+    This function calculates the stake that should be applied to line A and line B
+    :param positive_odds:
+    :param negative_odds:
+    :return:
+    """
+
+    positive_odds = (positive_odds / 100) + 1
+    negative_odds = (100 / (-negative_odds)) + 1
+
+    stake_b = positive_odds / negative_odds
+
+    return stake_b
+
+
 def arbitrage_loop(total_array):
     """
     The purpose of this function is two bring together the arrays from the lines manager as well as the calculations
@@ -124,7 +141,7 @@ def arbitrage_loop(total_array):
 
 def create_final_table(plays, cur):
     """
-    Given the array of plays with the associated uid's
+    Given the array of plays with the associated UIDs
     :param plays:
     :param cur:
     :return:
@@ -143,6 +160,8 @@ def create_final_table(plays, cur):
         result = cur.fetchone()
         uid = str(uuid.uuid4())
 
+        negative_stake = calculate_arbitrage_stake(play['positive']['price'], play['negative']['price'])
+
         complete_arbitrage_table.append({
             "uid": uid,
             "event_uid": result[0],
@@ -154,9 +173,11 @@ def create_final_table(plays, cur):
             "positive_play_price": play['positive']['price'],
             "positive_play_name": play['positive']['name'],
             "positive_play_book": play['positive']['book'],
+            "positive_play_stake": 1,
             "negative_play_price": play['negative']['price'],
             "negative_play_name": play['negative']['name'],
             "negative_play_book": play['negative']['book'],
+            "negative_play_stake": negative_stake,
             "arb_percent": play['play_percentage']
         })
 
@@ -164,16 +185,16 @@ def create_final_table(plays, cur):
 
     for row in complete_arbitrage_table:
         sql_table_insert = ("INSERT INTO arbitrage_data (uid, event_uid, event, home_team, away_team, commence_time, "
-                            "sport, positive_play_price, positive_play_name, positive_play_book, negative_play_price, "
-                            "negative_play_name, negative_play_book, arbitrage_percentage) VALUES (%s, %s, %s, %s, %s, "
-                            "%s, %s, %s, %s, %s, %s, %s, %s, %s)")
+                            "sport, positive_play_price, positive_play_name, positive_play_book, positive_play_stake, "
+                            "negative_play_price, negative_play_name, negative_play_book, negative_play_stake, "
+                            "arbitrage_percentage) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, "
+                            "%s)")
         table_insert_data = (row['uid'], row['event_uid'], row['game'], row['home_team'], row['away_team'],
                              row['commence_time'], row['sport'], row['positive_play_price'], row['positive_play_name'],
-                             row['positive_play_book'], row['negative_play_price'], row['negative_play_name'],
-                             row['negative_play_book'], row['arb_percent'])
+                             row['positive_play_book'], row['positive_play_stake'], row['negative_play_price'],
+                             row['negative_play_name'], row['negative_play_book'], row['negative_play_stake'],
+                             row['arb_percent'])
         cur.execute(sql_table_insert, table_insert_data)
-
-    return complete_arbitrage_table
 
 
 def arbitrage_main(connection, cursor):
@@ -182,14 +203,10 @@ def arbitrage_main(connection, cursor):
     calculator
     :return:
     """
-    # First call the line manager to prepare the lines
+
+    # This is the main arbitrage stack
     total = line_manager(cursor)
-
-    # Then call the arbitrage calculator
     all_plays = arbitrage_loop(total)
-    complete_table = create_final_table(all_plays, cursor)
-
-    for row in complete_table:
-        print("Play:: ", row)
+    create_final_table(all_plays, cursor)
 
     connection.commit()
