@@ -4,6 +4,7 @@ import time
 from scripts.positiveev import run_script
 from scripts.data_import import get_data
 from scripts.arbitrage import arbitrage_main
+from scripts.pev import positive_ev_main
 import os
 import psycopg2
 
@@ -82,6 +83,7 @@ def main_stack():
 
     get_data(dbconn, cur)
     arbitrage_main(dbconn, cur)
+    positive_ev_main(dbconn, cur)
 
     cur.close()
     dbconn.close()
@@ -99,6 +101,23 @@ def arbitrage_call():
     cur = dbconn.cursor()
 
     arbitrage_main(dbconn, cur)
+
+    cur.close()
+    dbconn.close()
+
+
+def pev_call():
+    dbconn = psycopg2.connect(
+        dbname='postgres',
+        user='postgres',
+        password='admin',
+        host='localhost',
+        port='5432',
+    )
+
+    cur = dbconn.cursor()
+
+    positive_ev_main(dbconn, cur)
 
     cur.close()
     dbconn.close()
@@ -133,6 +152,12 @@ def run_full_stack():
 def run_arbitrage():
     arbitrage_call()
     return jsonify({'message': 'The arbitrage test has finished running.'})
+
+
+@app.route('/pev-test', methods=['GET'])
+def run_positiveev():
+    pev_call()
+    return jsonify({'message': 'The positive ev test has finished running.'})
 
 
 # Initializing scheduler for a 15-minute interval

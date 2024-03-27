@@ -130,7 +130,7 @@ def arbitrage_loop(total_array):
                     if percentage > 0:
                         print("Positive Percentage: ", percentage)
                         arbitrage_plays.append({
-                            "uid": event['event_uid'],
+                            "event_uid": event['event_uid'],
                             "positive": p,
                             "negative": n,
                             "play_percentage": percentage,
@@ -155,7 +155,7 @@ def create_final_table(plays, cur):
 
     for play in plays:
         uid_search_sql = "SELECT * FROM all_data WHERE uid = %s"
-        cur.execute(uid_search_sql, (play['uid'],))
+        cur.execute(uid_search_sql, (play['event_uid'],))
 
         result = cur.fetchone()
         uid = str(uuid.uuid4())

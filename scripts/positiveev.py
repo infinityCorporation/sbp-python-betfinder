@@ -525,7 +525,6 @@ def run_script(connection, cur):
     connection.commit()
 
 
-
 plt.scatter(vigList, betList)
 # plt.show()
 
