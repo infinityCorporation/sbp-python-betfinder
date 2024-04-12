@@ -18,7 +18,8 @@ from scripts.dbmanager import check_duplicates, check_bet_time, check_odds_chang
 
 apiKey = "098b369ca52dc641b2bea6c901c24887"
 host = "api.the-odds-api.com"
-sports = ['americanfootball_nfl', 'americanfootball_ncaaf', 'basketball_nba', 'basketball_ncaab']
+sports = ['americanfootball_nfl', 'americanfootball_ncaaf', 'basketball_nba', 'basketball_ncaab', 'baseball_mlb',
+          'mma_mixed_martial_arts']
 markets = ['h2h', 'spreads', 'totals']
 # sports = ['americanfootball_nfl']
 # markets = ['h2h']
@@ -155,6 +156,7 @@ def calculate_implied_vig_two_way(implied_under: float, implied_over: float) -> 
     """
     implied_under, implied_over = np.abs(implied_under), np.abs(implied_over)
     implied_vig: float = (implied_over + implied_under) - 100
+
     total_no_vig = (implied_over + implied_under) - implied_vig
     adjusted_implied_under: float = (implied_under / (implied_over + implied_under)) * total_no_vig
     adjusted_implied_over: float = - (implied_over / (implied_over + implied_under)) * total_no_vig
@@ -170,9 +172,10 @@ def calculate_implied_vig_two_way_v2(implied_under: float, implied_over: float) 
     :return:
     """
     total_implied = np.abs(implied_over) + np.abs(implied_under)
-    vig: float = (1 - ((1 / total_implied) * 100)) * 100
-    new_over: float = (implied_over / total_implied) * 100
-    new_under: float = (implied_under / total_implied) * 100
+    vig = (1 - ((1 / total_implied) * 100)) * 100
+
+    new_over = (implied_over / total_implied) * 100
+    new_under = (implied_under / total_implied) * 100
     return round(vig, 2), round(new_over, 2), round(new_under, 2)
 
 
@@ -374,10 +377,10 @@ def points_based_loop_call(parsed_url):
                         'implied_profit': out_0_profit,
                     }
 
-                vig, ap_over, ap_under = calculate_implied_vig_two_way_v2(underdog['implied_probability'],
+                vig, ap_under, ap_over = calculate_implied_vig_two_way_v2(underdog['implied_probability'],
                                                                           favorite['implied_probability'])
-                ev_ap_over = calculate_expected_value(ap_over, ap_under, favorite['implied_profit'])
-                ev_ap_under = calculate_expected_value(ap_under, ap_over, underdog['implied_profit'])
+                ev_ap_over = calculate_expected_value(ap_under, ap_over, favorite['implied_profit'])
+                ev_ap_under = calculate_expected_value(ap_over, ap_under, underdog['implied_profit'])
 
                 totalList.append({
                     "favorite": favorite,
@@ -387,6 +390,17 @@ def points_based_loop_call(parsed_url):
                     "ap_over": ap_over,
                     "ap_under": ap_under,
                 })
+
+                print("line: ", favorite['price'])
+                print("line: ", underdog['price'])
+                print("prof: ", favorite['implied_profit'])
+                print("prof: ", underdog['implied_profit'])
+                print("prob: ", favorite['implied_probability'])
+                print("prob: ", underdog['implied_probability'])
+                print("adj prob: ", ap_over)
+                print("adj prob: ", ap_under)
+                print("pev: ", ev_ap_over)
+                print("nev: ", ev_ap_under)
 
                 if ev_ap_over > 0:
                     apEvList.append({

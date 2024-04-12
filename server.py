@@ -130,6 +130,11 @@ def run_task():
 
 
 # Endpoints
+@app.route('/status', methods=['GET'])
+def send_status():
+    return jsonify({'status': 'up'})
+
+
 @app.route('/trigger-task', methods=['GET'])
 def trigger_task():
     update_bet_data()
@@ -167,6 +172,6 @@ scheduler.start()
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=int(os.environ.get('PORT', 5000)))
+    app.run(debug=True, port=int(os.environ.get('PORT', 5001)))
 
 

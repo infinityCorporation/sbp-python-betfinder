@@ -1,0 +1,14 @@
+The first step of the bet scanning program is the importation of the various
+events and their betting lines from the respective books. This is currently done
+in two steps. The reason for this is that the standard markets and the alternate
+markets must be accessed in two different ways. While this could be done in the
+same file, I am splitting it up for simplicity.
+
+The first file, data_import.py, imports the standard markets. It grabs the h2h, totals,
+and spreads markets. Each event that is pulled has an event ID. This is then passed on as
+a list to the alternate_import.py file where I call the alternate markets for each event
+given its unique event ID.
+
+TBD: The data may be parsed and placed into the same database with the lines being added to
+the lines_data table. This would simplify things, but it will only work if the lines are all
+compatible.

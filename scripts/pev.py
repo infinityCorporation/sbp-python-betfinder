@@ -82,7 +82,24 @@ def line_manager(cur):
                         'negative_line': negative_line,
                     })
 
-                elif not (returned_line[3][0][0]['price'] < 0 and returned_line[3][0][1]['price'] < 0):
+                elif returned_line[3][0][0]['price'] < 0 and returned_line[3][0][1]['price'] < 0:
+                    positive_line = {
+                        'name': returned_line[3][0][0]['name'],
+                        'price': int(returned_line[3][0][0]['price'])
+                    }
+                    negative_line = {
+                        'name': returned_line[3][0][1]['name'],
+                        'price': int(returned_line[3][0][1]['price'])
+                    }
+
+                    pair_array.append({
+                        'uid': returned_line[0],
+                        'book': returned_line[5],
+                        'positive_line': positive_line,
+                        'negative_line': negative_line,
+                    })
+
+                else:
                     for outcome in returned_line[3][0]:
                         if outcome['price'] > 0:
                             positive_line = {
@@ -146,14 +163,14 @@ def calculate_probability(odds: int):
 
 def calculate_profits(odds):
     """
-    This function is to calculate both the negative and positive odds.
+    This function is to calculate both the negative and positive profit.
     :param odds:
     :return:
     """
     if odds > 0:
         return round(((odds / 100) * 100), 2)
     elif odds < 0:
-        return round(((100 / odds) * 100), 2)
+        return abs(round(((100 / odds) * 100), 2))
 
 
 # Here is where we are putting the Vig calculation and the EV calculation
@@ -164,25 +181,32 @@ def calculate_two_way_vig(negative_probability, positive_probability):
     :param positive_probability:
     :return vig, new_positive_price, new_negative_price:
     """
+    print("positive prob: ", positive_probability, " negative prob: ", negative_probability)
     total_implied = np.abs(negative_probability) + np.abs(positive_probability)
 
     vig = (1 - ((1 / total_implied) * 100)) * 100
     new_positive_probability = (positive_probability / total_implied) * 100
     new_negative_probability = (negative_probability / total_implied) * 100
 
-    return round(vig, 2), round(new_positive_probability, 2), round(new_negative_probability, 2)
+    return round(vig, 2), round(new_negative_probability, 2), round(new_positive_probability, 2)
 
 
-def calculate_expected_value(winning_probability, implied_profit):
+def calculate_expected_value(probability, price):
     """
-    Given the winning and losing probability and the current bet price, return the expected value in
-    percentage based terms.
-    :param winning_probability:
-    :param implied_profit:
-    :return expected_value:
+    This method represents a new approach to calculating expected value since the first function seemed to
+    be flawed in finding expected value opportunities. This way takes 2 sided lines.
+    :param probability:
+    :param price:
+    :return:
     """
-    losing_probability = 100 - winning_probability
-    expected_value = ((winning_probability / 100) * implied_profit) - losing_probability
+
+    expected_value = 0
+
+    if price > 0:
+        expected_value = ((price * probability) - 100 * (100 - probability)) / 100
+    elif price < 0:
+        expected_value = ((100 * probability) - (abs(price) * (100 - probability))) / 100
+
     return round(expected_value, 2)
 
 
@@ -199,12 +223,14 @@ def create_final_table(positive_ev_array, cur):
 
     for row in positive_ev_array:
         pev_insert_sql = ("INSERT INTO pev_data (uid, event_uid, event, home_team, away_team, commence_time, sport, "
-                          "positive_play_price, positive_play_name, positive_play_percentage, book) VALUES (%s, %s, %s, %s, "
-                          "%s, %s, %s, %s, %s, %s, %s)")
+                          "positive_play_price, positive_play_name, positive_play_percentage, book, "
+                          "opposing_play_price, no_vig_probability, pev_line_probability) VALUES (%s, %s, %s, %s, %s, "
+                          "%s, %s, %s, %s, %s, %s, %s, %s, %s)")
         cur.execute(pev_insert_sql, (uid, row['event']['event_uid'], row['event']['event'], row['event']['home_team'],
                                      row['event']['away_team'], row['event']['commence_time'], row['event']['sport'],
                                      row['line']['price'], row['line']['name'], row['positive_expected_value'],
-                                     row['book']))
+                                     row['book'], row['opposing_play_price'], row['adjusted_probability'],
+                                     row['pev_line_probability']))
 
         # This may arguably be too heavily layered with JSON formatting. Maybe step it down in earlier functions
 
@@ -240,23 +266,36 @@ def pev_main_loop(total_array, cur):
                 # Just to note: there is no actual reason to return the vig, it can just be calculated and then deleted
                 event_vig, adjusted_positive_probability, adjusted_negative_probability = calculate_two_way_vig(
                     positive_probability, negative_probability)
-                positive_expected_value = calculate_expected_value(adjusted_positive_probability, positive_profit)
-                negative_expected_value = calculate_expected_value(adjusted_negative_probability, negative_profit)
+
+                print("pos adj: ", adjusted_positive_probability, " neg adj: ", adjusted_negative_probability)
+
+                positive_expected_value = calculate_expected_value(adjusted_positive_probability,
+                                                                   positive_line['price'])
+                negative_expected_value = calculate_expected_value(adjusted_negative_probability,
+                                                                   negative_line['price'])
 
                 # Finally, append the results to a list that can be added to a table (still needs a function)
+                print("pev: ", positive_expected_value)
+                print("nev: ", negative_expected_value)
                 if positive_expected_value > 0:
                     expected_value_results.append({
                         'event': event,
                         'book': str(line['book']),
                         'line': line['positive_line'],
                         'positive_expected_value': positive_expected_value,
+                        'opposing_play_price': negative_line['price'],
+                        'adjusted_probability': adjusted_positive_probability,
+                        'pev_line_probability': positive_probability,
                     })
                 elif negative_expected_value > 0:
                     expected_value_results.append({
                         'event': event,
                         'book': str(line['book']),
                         'line': line['negative_line'],
-                        'positive_expected_value': negative_expected_value
+                        'positive_expected_value': negative_expected_value,
+                        'opposing_play_price': positive_line['price'],
+                        'adjusted_probability': adjusted_negative_probability,
+                        'pev_line_probability': negative_probability,
                     })
 
     # Create the final table
@@ -272,6 +311,11 @@ def positive_ev_main(connection, cursor):
     :return:
     """
     # Here, we will call the main loop then commit the connection
+
+    # Initially, we want to clear the table
+    clear_sql = "DELETE FROM pev_data"
+    cursor.execute(clear_sql)
+    connection.commit()
 
     # First, grab all the lines from the lines manager
     total_lines = line_manager(cursor)

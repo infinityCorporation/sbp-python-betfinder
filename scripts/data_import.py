@@ -1,27 +1,38 @@
-import http.client as client
+# Library imports
 import uuid
 from datetime import datetime, timezone
 import json
 
+# Script imports
 from scripts.dbmanager import check_bet_time_v2
-from scripts.utilities import pull_event_lines
+from scripts.alternate_import import alternate_import
+from scripts.utilities import event_import_with_duplicate_check, lines_import_without_check, create_api_connection
 
-apiKey = "098b369ca52dc641b2bea6c901c24887"
-host = "api.the-odds-api.com"
+# frisbiecorp@gmail.com: 5ab51a74ab7fea2414dbade0cf9d7229
+# contact@arrayassistant.ai: 098b369ca52dc641b2bea6c901c24887
 
-conn = client.HTTPSConnection(host)
+apiKey = "5ab51a74ab7fea2414dbade0cf9d7229"
+conn = create_api_connection()
 
 # Add the sports and market arrays
-sports = ['americanfootball_nfl', 'americanfootball_ncaaf', 'basketball_nba', 'basketball_ncaab', 'baseball_mlb',
-          'mma_mixed_martial_arts']
-betting_markets = ['h2h', 'spreads', 'totals']
-# sports = ['mma_mixed_martial_arts']
-# betting_markets = ['h2h']
+# sports = ['americanfootball_nfl', 'americanfootball_ncaaf', 'basketball_nba', 'basketball_ncaab', 'baseball_mlb',
+#         'mma_mixed_martial_arts']
+# betting_markets = ['h2h', 'spreads', 'totals']
+sports = ['basketball_nba', 'basketball_ncaab']
+betting_markets = ['h2h']
 current_utc_time = datetime.now(timezone.utc)
 date_time = current_utc_time.strftime('%Y-%m-%dT%H:%M:%SZ')
 
+# sports = ['basketball_nba', 'basketball_ncaab']
+# betting_markets = ['h2h_q1', 'h2h_q2', 'h2h_q3', 'h2h_q4', 'h2h_h1', 'h2h_h2', 'spreads_q1', 'spreads_q2',
+#                   'spreads_q3', 'spreads_q4', 'spreads_h1', 'spreads_h2', 'totals_q1', 'totals_q2', 'totals_q3',
+#                   'totals_q4', 'totals_h1', 'totals_h2', ]
+
+
+# Initialize the necessary arrays
 all_markets = []
 all_lines = []
+all_event_ids = []
 
 # Pull the data from the api
 # From the API an array is sent with the following structure:
@@ -59,64 +70,86 @@ def games_loop_call(parsed_url):
     :param parsed_url:
     :return:
     """
+
+    # Loop through all returned json event objects for a given sport
     for a in parsed_url:
 
-        uid = str(uuid.uuid4())
-        event = a['home_team'] + " vs " + a['away_team']
-        commence_time = a['commence_time']
-        update_time = date_time
-        home_team = a['home_team']
-        away_team = a['away_team']
-        sport_key = a['sport_key']
-        sport_name = a['sport_title']
-        markets = []
+        try:
+            uid = str(uuid.uuid4())
+            event_id = a['id']
+            event = a['home_team'] + " vs " + a['away_team']
+            commence_time = a['commence_time']
+            update_time = date_time
+            home_team = a['home_team']
+            away_team = a['away_team']
+            sport_key = a['sport_key']
+            sport_name = a['sport_title']
+            markets = []
 
-        for x in a["bookmakers"]:
-            id_creator = str(uuid.uuid4())
+            # Add all ids and sport keys for alternative imports
+            all_event_ids.append({
+                'id': a['id'],
+                'key': a['sport_key'],
+            })
 
-            book = x['key']
-            book_title = x['title']
-            lines = id_creator
+            # Loop through each bookmaker for a given event
+            for x in a["bookmakers"]:
+                id_creator = str(uuid.uuid4())
 
-            for y in x['markets']:
-                #This means that the line linked in the event object is the same as the line linked in the lines data
-                line_id = id_creator
+                book = x['key']
+                book_title = x['title']
+                lines = id_creator
 
-                key = y['key']
-                last_update = y['last_update']
-                outcomes = y['outcomes']
+                # Loop through each line in the bookmaker's markets
+                for y in x['markets']:
 
-                line_object = {
-                    'uid': line_id,
-                    'key': key,
-                    'last_update': last_update,
-                    'commence_time': commence_time,
-                    'outcomes': outcomes,
+                    line_id = id_creator
+                    key = y['key']
+                    last_update = y['last_update']
+                    outcomes = y['outcomes']
+
+                    # Create a single line object for each line
+                    line_object = {
+                        'uid': line_id,
+                        'key': key,
+                        'last_update': last_update,
+                        'commence_time': commence_time,
+                        'outcomes': outcomes,
+                        'book': book,
+                    }
+                    all_lines.append(line_object)
+
+                # Create an object for each book's info and all lines
+                bookmaker_object = {
                     'book': book,
+                    'title': book_title,
+                    'lines': lines,
                 }
-                all_lines.append(line_object)
+                markets.append(bookmaker_object)
 
-            bookmaker_object = {
-                'book': book,
-                'title': book_title,
-                'lines': lines,
+            # Finally, create an object with all the event's information
+            event_object = {
+                'uid': uid,
+                'id': event_id,
+                'event': event,
+                'commence_time': commence_time,
+                'update_time': update_time,
+                'home_team': home_team,
+                'away_team': away_team,
+                'sport_key': sport_key,
+                'sport_name': sport_name,
+                'markets': markets,
             }
-            markets.append(bookmaker_object)
 
-        event_object = {
-            'uid': uid,
-            'event': event,
-            'commence_time': commence_time,
-            'update_time': update_time,
-            'home_team': home_team,
-            'away_team': away_team,
-            'sport_key': sport_key,
-            'sport_name': sport_name,
-            'markets': markets,
-        }
+            print(event_object)
+            all_markets.append(event_object)
 
-        print(event_object)
-        all_markets.append(event_object)
+        except NameError:
+            print("The line with the error was: ")
+            print(json.dumps(a))
+        except TypeError:
+            print("There was a type err here: ")
+            print(json.dumps(a))
 
 
 def get_data(connection, cur):
@@ -143,62 +176,20 @@ def get_data(connection, cur):
             content = response.read()
             parsed = json.loads(content)
 
+            print(parsed)
+
             games_loop_call(parsed)
 
             print("all_markets Array: ", all_markets)
 
-    for x in all_markets:
-        markets = [json.dumps(x['markets'])]
-        duplicate_exists = False
+    # Call the utility to import all events with duplicate check
+    event_import_with_duplicate_check(all_markets, cur)
 
-        # If a duplicate exists, delete the old one and the olds ones lines and then insert the new one and its lines.
-        # It should honestly be as simple as that.
+    # Call the utility to import all lines
+    lines_import_without_check(all_lines, cur)
 
-        # Rebuilt duplicate check
-        # Check for a value in all data table that matches our value in all_market array
-        sql_check = ("SELECT * FROM all_data WHERE event = %s AND commence_time = %s AND home_team"
-                     "= %s AND away_team = %s AND sport_key = %s AND sport_title = %s")
-        check_data = (x["event"], x['commence_time'], x['home_team'], x['away_team'], x['sport_key'], x['sport_name'])
-        cur.execute(sql_check, check_data)
+    # Call the import for all alternative event markets
+    alternate_import(all_event_ids, cur)
 
-        # Get the first result
-        check_result = cur.fetchone()
-        print("Check result is: ", check_result)
-
-        # Check if the result exists
-        if check_result:
-            print("Duplicate Event: ", check_result)
-            delete_array = pull_event_lines(check_result)
-
-            # Run another for loop to delete all the lines, this step could be streamlined if working
-            for line in delete_array:
-                delete_line_sql = "DELETE from lines_data WHERE uid = %s"
-                cur.execute(delete_line_sql, (line,))
-                print("Line Deleted: ", line)
-
-            # Finally, delete the line and move the cursor.
-            print("Event Deleted: ", check_result[0])
-            delete_event_sql = ("DELETE FROM all_data WHERE uid = %s")
-            cur.execute(delete_event_sql, (check_result[0],))
-
-        # Add the new event regardless of any of the above stuff
-        add_new_event_sql = ("INSERT INTO all_data (uid, event, commence_time, update_time, home_team, away_team, "
-                             "sport_key, sport_title, markets) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s::json[])")
-        insert_data = (x['uid'], x["event"], x['commence_time'], x['update_time'], x['home_team'], x['away_team'],
-                       x['sport_key'], x['sport_name'], markets)
-        cur.execute(add_new_event_sql, insert_data)
-        print("Event Added: ", x['uid'])
-
-    # Here, the lines are inserted with no duplication check. The duplication check should be caught by the previous
-    # check
-    for y in all_lines:
-        sql = ("INSERT INTO lines_data (uid, key, last_update, outcomes, commence_time, book) VALUES "
-               "(%s, %s, %s, %s::json[], %s, %s)")
-
-        outcomes = [json.dumps(y['outcomes'])]
-
-        data = (y['uid'], y['key'], y['last_update'], outcomes, y['commence_time'], y['book'])
-
-        cur.execute(sql, data)
-
+    # Commit all database changes for data import and alternative import
     connection.commit()
