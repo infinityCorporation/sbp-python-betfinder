@@ -45,35 +45,33 @@ def event_import_with_duplicate_check(markets, cur):
 
         # Check for a value in all data table that matches our value in markets array
         sql_check = ("SELECT * FROM all_data WHERE event = %s AND commence_time = %s AND home_team"
-                     "= %s AND away_team = %s AND sport_key = %s AND sport_title = %s")
-        check_data = (x["event"], x['commence_time'], x['home_team'], x['away_team'], x['sport_key'], x['sport_name'])
+                     "= %s AND away_team = %s AND sport_key = %s AND sport_title = %s AND bet_key = %s")
+        check_data = (x["event"], x['commence_time'], x['home_team'], x['away_team'], x['sport_key'], x['sport_name'],
+                      x['bet_key'])
         cur.execute(sql_check, check_data)
 
         # Get the first result
         check_result = cur.fetchone()
-        print("Check result is: ", check_result)
 
         # Check if the result exists, if it does, get the events lines to delete them as well
         if check_result:
-            print("Duplicate Event: ", check_result)
             lines_to_delete_array = pull_event_lines(check_result)
 
             # Once the lines are collected, loop through the array and delete them one at a time
             for line in lines_to_delete_array:
                 delete_line_sql = "DELETE from lines_data WHERE uid = %s"
                 cur.execute(delete_line_sql, (line,))
-                print("Line Deleted: ", line)
 
             # Once the lines are deleted, delete the duplicate event
-            print("Event Deleted: ", check_result[0])
             delete_event_sql = "DELETE FROM all_data WHERE uid = %s"
             cur.execute(delete_event_sql, (check_result[0],))
 
         # Regardless of whether there is a duplicate event, we will add the new event to make sure no data is missed
         add_new_event_sql = ("INSERT INTO all_data (uid, event, commence_time, update_time, home_team, away_team, "
-                             "sport_key, sport_title, markets) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s::json[])")
+                             "sport_key, sport_title, markets, bet_key) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, "
+                             "%s::json[], %s)")
         insert_data = (x['uid'], x["event"], x['commence_time'], x['update_time'], x['home_team'], x['away_team'],
-                       x['sport_key'], x['sport_name'], [json.dumps(x['markets'])])
+                       x['sport_key'], x['sport_name'], [json.dumps(x['markets'])], x['bet_key'])
         cur.execute(add_new_event_sql, insert_data)
         print("Event Added: ", x['uid'])
 
@@ -88,6 +86,7 @@ def lines_import_without_check(lines, cur):
     """
 
     for y in lines:
+        print("line:", y)
         sql = ("INSERT INTO lines_data (uid, key, last_update, outcomes, commence_time, book) VALUES "
                "(%s, %s, %s, %s::json[], %s, %s)")
 
@@ -95,7 +94,7 @@ def lines_import_without_check(lines, cur):
             data = (y['uid'], y['key'], y['last_update'], [json.dumps(y['outcomes'])], y['commence_time'], y['book'])
             cur.execute(sql, data)
         except:
-            print("There was an error: ")
-            print(y)
+            print("There was an error... ")
+            print(" ------- ")
 
         print("Line Added: ", y['uid'])

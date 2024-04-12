@@ -9,14 +9,14 @@ from scripts.utilities import event_import_with_duplicate_check, lines_import_wi
 
 
 # Initialize arrays for alternative market keys
-betting_markets = ['h2h_q1']
+# betting_markets = ['h2h_q1']
 # betting_markets = ['h2h_q1', 'h2h_q2', 'h2h_q3', 'h2h_q4']
-# betting_markets = ['h2h_q1', 'h2h_q2', 'h2h_q3', 'h2h_q4', 'h2h_h1', 'h2h_h2', 'spreads_q1', 'spreads_q2',
-#                    'spreads_q3', 'spreads_q4', 'spreads_h1', 'spreads_h2', 'totals_q1', 'totals_q2', 'totals_q3',
-#                    'totals_q4', 'totals_h1', 'totals_h2', ]
+betting_markets = ['h2h_q1', 'h2h_q2', 'h2h_q3', 'h2h_q4', 'h2h_h1', 'h2h_h2', 'spreads_q1', 'spreads_q2',
+                   'spreads_q3', 'spreads_q4', 'spreads_h1', 'spreads_h2', 'totals_q1', 'totals_q2', 'totals_q3',
+                   'totals_q4', 'totals_h1', 'totals_h2', ]
 
 # Create an HTTPS connection for the data API
-apiKey = "5ab51a74ab7fea2414dbade0cf9d7229"
+apiKey = "cc1dcf7f444d59f7e4940113969b8e19"
 conn = create_api_connection()
 
 # Set up a date-time variable to create time stamps
@@ -32,11 +32,12 @@ def get_event_id():
     return
 
 
-def games_loop_call(parsed):
+def games_loop_call(parsed, bet_key):
     """
     This function takes in the raw data from the API, but doesn't actually pull it, and sorts it into an array that can
     actually be used in the program.
     :param parsed:
+    :param bet_key:
     :return:
     """
 
@@ -77,7 +78,7 @@ def games_loop_call(parsed):
                     'last_update': last_update,
                     'commence_time': commence_time,
                     'outcomes': outcomes,
-                    'book': book,
+                    'book': book_key,
                 }
                 all_alt_lines.append(line_object)
 
@@ -87,6 +88,8 @@ def games_loop_call(parsed):
                 'title': book_title,
                 'lines': lines_uid,
             }
+
+            print("The bookmaker Object is: ", bookmaker_object)
 
             event_markets.append(bookmaker_object)
 
@@ -102,6 +105,7 @@ def games_loop_call(parsed):
             'sport_key': sport_key,
             'sport_name': sport_name,
             'markets': event_markets,
+            'bet_key': bet_key,
         }
 
         print(event_object)
@@ -141,7 +145,7 @@ def alternate_import(event_ids, cur):
             content = response.read()
             parsed = json.loads(content)
 
-            games_loop_call(parsed)
+            games_loop_call(parsed, m)
 
             print(parsed)
 

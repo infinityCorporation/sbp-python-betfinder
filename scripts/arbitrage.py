@@ -170,6 +170,7 @@ def create_final_table(plays, cur):
             "home_team": result[4],
             "away_team": result[5],
             "sport": result[7],
+            "bet_type": result[9],
             "positive_play_price": play['positive']['price'],
             "positive_play_name": play['positive']['name'],
             "positive_play_book": play['positive']['book'],
@@ -187,13 +188,13 @@ def create_final_table(plays, cur):
         sql_table_insert = ("INSERT INTO arbitrage_data (uid, event_uid, event, home_team, away_team, commence_time, "
                             "sport, positive_play_price, positive_play_name, positive_play_book, positive_play_stake, "
                             "negative_play_price, negative_play_name, negative_play_book, negative_play_stake, "
-                            "arbitrage_percentage) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, "
-                            "%s)")
+                            "arbitrage_percentage, bet_type) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, "
+                            "%s, %s)")
         table_insert_data = (row['uid'], row['event_uid'], row['game'], row['home_team'], row['away_team'],
                              row['commence_time'], row['sport'], row['positive_play_price'], row['positive_play_name'],
                              row['positive_play_book'], row['positive_play_stake'], row['negative_play_price'],
                              row['negative_play_name'], row['negative_play_book'], row['negative_play_stake'],
-                             row['arb_percent'])
+                             row['arb_percent'], row['bet_type'])
         cur.execute(sql_table_insert, table_insert_data)
 
 

@@ -10,8 +10,9 @@ from scripts.utilities import event_import_with_duplicate_check, lines_import_wi
 
 # frisbiecorp@gmail.com: 5ab51a74ab7fea2414dbade0cf9d7229
 # contact@arrayassistant.ai: 098b369ca52dc641b2bea6c901c24887
+# efrisbie2232@gmail.com: cc1dcf7f444d59f7e4940113969b8e19
 
-apiKey = "5ab51a74ab7fea2414dbade0cf9d7229"
+apiKey = "cc1dcf7f444d59f7e4940113969b8e19"
 conn = create_api_connection()
 
 # Add the sports and market arrays
@@ -19,7 +20,7 @@ conn = create_api_connection()
 #         'mma_mixed_martial_arts']
 # betting_markets = ['h2h', 'spreads', 'totals']
 sports = ['basketball_nba', 'basketball_ncaab']
-betting_markets = ['h2h']
+betting_markets = ['h2h', 'spreads', 'totals']
 current_utc_time = datetime.now(timezone.utc)
 date_time = current_utc_time.strftime('%Y-%m-%dT%H:%M:%SZ')
 
@@ -63,11 +64,12 @@ def clean_up_prep(cursor):
     check_bet_time_v2(cursor, "all_data")
 
 
-def games_loop_call(parsed_url):
+def games_loop_call(parsed_url, bet_key):
     """
     This function takes in the raw data from the API, but doesn't actually pull it, and sorts it into an array that can
     actually be used in the program.
     :param parsed_url:
+    :param bet_key:
     :return:
     """
 
@@ -87,10 +89,14 @@ def games_loop_call(parsed_url):
             markets = []
 
             # Add all ids and sport keys for alternative imports
-            all_event_ids.append({
+            if not all_event_ids.__contains__({
                 'id': a['id'],
                 'key': a['sport_key'],
-            })
+            }):
+                all_event_ids.append({
+                    'id': a['id'],
+                    'key': a['sport_key'],
+                })
 
             # Loop through each bookmaker for a given event
             for x in a["bookmakers"]:
@@ -139,6 +145,7 @@ def games_loop_call(parsed_url):
                 'sport_key': sport_key,
                 'sport_name': sport_name,
                 'markets': markets,
+                'bet_key': bet_key,
             }
 
             print(event_object)
@@ -178,7 +185,7 @@ def get_data(connection, cur):
 
             print(parsed)
 
-            games_loop_call(parsed)
+            games_loop_call(parsed, m)
 
             print("all_markets Array: ", all_markets)
 
