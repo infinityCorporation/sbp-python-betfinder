@@ -98,3 +98,48 @@ def lines_import_without_check(lines, cur):
             print(" ------- ")
 
         print("Line Added: ", y['uid'])
+
+
+def compare_lines(first_line, second_line):
+    """
+    The goal here is to take two lines and compare them, returning a positive line and a negative line
+    :param first_line:
+    :param second_line:
+    :return positive_line, negative_line:
+    """
+
+    positive_line = {}
+    negative_line = {}
+
+    first_price = first_line['price']
+    second_price = second_line['price']
+
+    if (first_price > 0 and second_price > 0) or (first_price < 0 and second_price < 0):
+        if first_price > second_price:
+            positive_line = {
+                'name': first_line['name'],
+                'price': int(first_price),
+                'probability': None,
+                'no_vig_price': None,
+            }
+            negative_line = {
+                'name': second_line['name'],
+                'price': int(second_price),
+                'probability': None,
+                'no_vig_price': None,
+            }
+        else:
+            positive_line = {
+                'name': second_line['name'],
+                'price': int(second_price),
+                'probability': None,
+                'no_vig_price': None,
+            }
+            negative_line = {
+                'name': first_line['name'],
+                'price': int(first_price),
+                'probability': None,
+                'no_vig_price': None,
+            }
+
+    return positive_line, negative_line

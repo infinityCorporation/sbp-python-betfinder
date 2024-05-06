@@ -1,0 +1,15 @@
+It has been discovered that the current method of positive EV will no longer work to find bets with a positive
+expected value. The new approach has only been designed theoretically at the given time. The current idea is to take a
+given two-way event, say something like an NBA game, and calculate essentially the probability of each side happening
+based on the vig-removed implied probability. From here, we can create our own market determined line, say -250 or +130,
+for each side of the event. Then, we can go through and compare each line for each side of the event at each book to
+this determined line. So if we had 5 books on 1 event with a total of 10 lines, 5 of the lines would get compared to the
+favorite and 5 to the underdog with the positive ev equation.
+
+Some things worth noting about this method are as follows. Firstly, I need to make sure that I removed the vig from each
+book's lines before anything else happens. Essentially, we need a new set of lines for each book that are vig adjusted.
+Additionally, I need to make sure that I am accurately comparing the lines to their counterpart market average line.
+This is important for certain bets where you may not have a specific 'underdog' or 'favorite'. Finally, I think it is
+also important to check some of the math on this due to the fact that this method has not yet been fully confirmed to
+be a viable way of finding positive EV. While the math checks out at a basic level, it should be tested further to make
+sure that it actually is finding Positive Expected Value Bets.
