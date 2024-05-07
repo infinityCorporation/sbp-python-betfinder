@@ -91,6 +91,13 @@ def line_manager(cur):
                     "average_negative": None,
                 })
 
+            # I believe the way I was intending for this to work is that as the various processors run, the different
+            # values for each event get filled out. First, the no vig odds need to be calculated as well as probability.
+            # Then, these values get added to the outcome in pair-array. Next, we put together the positive and negative
+            # array and add those values to the two emtpy spots in the total array. We then use those arrays to calc
+            # the average value of the line. Finally, we can go back to pair array and calculate the outcome of each of
+            # the values based on their comparison to the opposing average line.
+
     return total_array
 
 # Next, attach the implied probabilities and all the given vig removed probabilities to the same array, or in a new one
@@ -214,11 +221,17 @@ def ev_main(cursor, connection):
     :return:
     """
 
+    print("You are running pev2... ")
+
     # First, call the line manager to get the events and sort the lines
     event_array = line_manager(cursor)
 
+    print("The line manager has run successfully... ")
+    print("------------")
+    print(event_array)
+
     # Next, call the main loop to complete the functionality
-    pev_main_loop(event_array)
+    # pev_main_loop(event_array)
 
 
     return
