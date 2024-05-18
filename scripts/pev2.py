@@ -145,14 +145,19 @@ def probability_vig_processor(event):
         return round(vig, 2), round(new_negative_probability, 2), round(new_positive_probability, 2)
 
     for outcome in event['pair_array']:
-        outcome['positive_line']['probability'] = calculate_probability(outcome['positive_line']['price'])
-        outcome['negative_line']['probability'] = calculate_probability(outcome['negative_line']['price'])
+        if outcome['positive_line'] and outcome['negative_line']:
+            print("The outcome being calculated is: ", outcome)
+            print("The prices being used to calculate are pos: ", outcome['positive_line']['price'], " and neg: ",
+                  outcome['negative_line']['price'])
 
-        vig, outcome['positive_line']['no_vig_price'], outcome['negative_line']['no_vig_price'] = calculate_two_way_vig(
-            outcome['positive_line']['probability'], outcome['negative_line']['probability'])
+            outcome['positive_line']['probability'] = calculate_probability(outcome['positive_line']['price'])
+            outcome['negative_line']['probability'] = calculate_probability(outcome['negative_line']['price'])
 
-        positive_array.append(outcome['positive_line'])
-        negative_array.append(outcome['negative_line'])
+            vig, outcome['positive_line']['no_vig_price'], outcome['negative_line']['no_vig_price'] = calculate_two_way_vig(
+                outcome['positive_line']['probability'], outcome['negative_line']['probability'])
+
+            positive_array.append(outcome['positive_line'])
+            negative_array.append(outcome['negative_line'])
 
     event['positive_array'], event['negative_array'] = positive_array, negative_array
 
@@ -173,18 +178,25 @@ def average_processor(event):
     average_positive = 0
     average_negative = 0
 
-    for line in event['positive_array']:
-        average_positive += line['price']
+    print("The positive array is: ", event['positive_array'])
 
-    average_positive = average_positive / len(event['positive_array'])
+    # I believe the issue occuring here is that you never populated the positive/negative arrays
+    # so at the moment they are just empty but you are attempting to use their length to divide
 
-    for line in event['negative_array']:
-        average_negative += line['price']
+    if len(event['positive_array']) > 0 and len(event['negative_array']) > 0:
 
-    average_negative = average_negative / len(event['negative_array'])
+        for line in event['positive_array']:
+            average_positive += line['price']
 
-    event['average_positive'] = average_positive
-    event['average_negative'] = average_negative
+        average_positive = average_positive / len(event['positive_array'])
+
+        for line in event['negative_array']:
+            average_negative += line['price']
+
+        average_negative = average_negative / len(event['negative_array'])
+
+        event['average_positive'] = average_positive
+        event['average_negative'] = average_negative
 
     return event
 
@@ -203,6 +215,12 @@ def pev_main_loop(events):
     for event in events:
         event = probability_vig_processor(event)
         event = average_processor(event)
+
+        print("The event looks like: ", event)
+        print("The average positive value is: ", event['average_positive'])
+        print("The average negative value is: ", event['average_negative'])
+
+
 
     # Now that we have hit the mid-point of finding the averages, this feels like a good place to stop. Test this and
     # make sure that you are actually getting average values out before continuing. There is a lot of weird stuff with
@@ -231,7 +249,7 @@ def ev_main(cursor, connection):
     print(event_array)
 
     # Next, call the main loop to complete the functionality
-    # pev_main_loop(event_array)
+    pev_main_loop(event_array)
 
 
     return
