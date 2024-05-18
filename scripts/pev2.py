@@ -1,12 +1,19 @@
 # This is the third positive EV and implementing the second method for finding positive EV bets.
 
-# The concept is simple, I will use the average line set by the market to determine what lines actually present a
+# The concept is simple as of 3/21/24, I'll use the average market line to determine what lines actually present a
 # positive expected value. By comparing each line to the average, it should be easy to find out whether there's an
 # opportunity available. With more data, I can consider finding a weighted average based on sharper books like pinnacle.
+
+# New goal as of 5/17/24 is to complete pev2 but to do it with the event objet instead of the event array. I am going
+# to embrace the oop pattern and attempt to combine it in a productive way with the current functional programming
+# style. One of the big initial goals is to figure out what functions should be moved to the object and what functions
+# should not. This should simplify the actual product functionality scripts.
+
 
 import uuid
 import numpy as np
 from scripts.utilities import pull_event_lines, compare_lines
+from scripts.FunctionalTesting.class_test import Event
 
 # First, grab all the lines of a given event and store them in an array that allows all of them to be accessed for that
 # specific event
@@ -21,6 +28,7 @@ def line_manager(cur):
     """
 
     total_array = []
+    all_event_objects_array = []
 
     pull_all_sql = "SELECT * FROM all_data"
     cur.execute(pull_all_sql)
@@ -91,6 +99,13 @@ def line_manager(cur):
                     "average_negative": None,
                 })
 
+                event_object = Event(event[0], event[1], event[2], event[7], home_team, away_team, pair_array,
+                                     None, None, None, None,
+                                     None)
+                all_event_objects_array.append(event_object)
+
+
+
             # I believe the way I was intending for this to work is that as the various processors run, the different
             # values for each event get filled out. First, the no vig odds need to be calculated as well as probability.
             # Then, these values get added to the outcome in pair-array. Next, we put together the positive and negative
@@ -98,7 +113,7 @@ def line_manager(cur):
             # the average value of the line. Finally, we can go back to pair array and calculate the outcome of each of
             # the values based on their comparison to the opposing average line.
 
-    return total_array
+    return total_array, all_event_objects_array
 
 # Next, attach the implied probabilities and all the given vig removed probabilities to the same array, or in a new one
 # that is attached to the same array.
@@ -135,7 +150,7 @@ def probability_vig_processor(event):
         :param positive_probability:
         :return vig, new_positive_price, new_negative_price:
         """
-        print("positive prob: ", positive_probability, " negative prob: ", negative_probability)
+
         total_implied = np.abs(negative_probability) + np.abs(positive_probability)
 
         vig = (1 - ((1 / total_implied) * 100)) * 100
@@ -146,9 +161,6 @@ def probability_vig_processor(event):
 
     for outcome in event['pair_array']:
         if outcome['positive_line'] and outcome['negative_line']:
-            print("The outcome being calculated is: ", outcome)
-            print("The prices being used to calculate are pos: ", outcome['positive_line']['price'], " and neg: ",
-                  outcome['negative_line']['price'])
 
             outcome['positive_line']['probability'] = calculate_probability(outcome['positive_line']['price'])
             outcome['negative_line']['probability'] = calculate_probability(outcome['negative_line']['price'])
@@ -177,8 +189,6 @@ def average_processor(event):
 
     average_positive = 0
     average_negative = 0
-
-    print("The positive array is: ", event['positive_array'])
 
     # I believe the issue occuring here is that you never populated the positive/negative arrays
     # so at the moment they are just empty but you are attempting to use their length to divide
@@ -216,10 +226,6 @@ def pev_main_loop(events):
         event = probability_vig_processor(event)
         event = average_processor(event)
 
-        print("The event looks like: ", event)
-        print("The average positive value is: ", event['average_positive'])
-        print("The average negative value is: ", event['average_negative'])
-
 
 
     # Now that we have hit the mid-point of finding the averages, this feels like a good place to stop. Test this and
@@ -242,11 +248,33 @@ def ev_main(cursor, connection):
     print("You are running pev2... ")
 
     # First, call the line manager to get the events and sort the lines
-    event_array = line_manager(cursor)
+    event_array, event_object_array = line_manager(cursor)
 
     print("The line manager has run successfully... ")
     print("------------")
     print(event_array)
+
+    print("------------")
+    print("------------")
+    print("The object array you are looking for is: ")
+    print("------------")
+    print("------------")
+    print(event_object_array)
+    print("------------")
+    print("------------")
+    print("A single object is: ")
+    print("------------")
+    print("------------")
+
+    for event in event_object_array:
+        print(event.event)
+
+    print("------------")
+    print("------------")
+
+    # Prevailing issues here: There are way to many event instances, like way too many. Additionally, I think
+    # that this could point to a problem in the way that I am pulling and/or saving data from the api. It could
+    # also be something in this file but I have my doubts about that. Check the db and see what is up.
 
     # Next, call the main loop to complete the functionality
     pev_main_loop(event_array)

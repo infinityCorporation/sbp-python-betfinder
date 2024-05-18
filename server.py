@@ -6,6 +6,7 @@ from scripts.data_import import get_data
 from scripts.arbitrage import arbitrage_main
 from scripts.pev import positive_ev_main
 from scripts.pev2 import ev_main
+from scripts.FunctionalTesting.class_test import create_and_test_class
 import os
 import psycopg2
 
@@ -141,6 +142,11 @@ def pev2_call():
     dbconn.close()
 
 
+# The purpose of this function is essentially to run any small tests that do not need their own dedicated route
+def small_tests_def():
+    create_and_test_class()
+
+
 # Your function that performs the task
 def run_task():
     # Perform the task here (e.g., running your Python script)
@@ -187,6 +193,11 @@ def run_positiveev():
 def test_pev():
     pev2_call()
     return jsonify({'message': 'The pev2 test has finished running. '})
+
+@app.route("/test", methods=['GET'])
+def small_tests():
+    small_tests_def()
+    return jsonify({'message': 'The small test you ran passed with no errors'})
 
 
 # Initializing scheduler for a 15-minute interval
