@@ -1,6 +1,10 @@
 # Library imports
 import json
+import numpy as np
 import http.client as client
+
+# Class references
+from scripts.classes.lineClass import Line
 
 
 def create_api_connection():
@@ -116,30 +120,41 @@ def compare_lines(first_line, second_line):
 
     if (first_price > 0 and second_price > 0) or (first_price < 0 and second_price < 0):
         if first_price > second_price:
-            positive_line = {
-                'name': first_line['name'],
-                'price': int(first_price),
-                'probability': None,
-                'no_vig_price': None,
-            }
-            negative_line = {
-                'name': second_line['name'],
-                'price': int(second_price),
-                'probability': None,
-                'no_vig_price': None,
-            }
+            positive_line = Line(first_line['name'], int(first_price))
+            negative_line = Line(second_line['name'], int(second_price))
         else:
-            positive_line = {
-                'name': second_line['name'],
-                'price': int(second_price),
-                'probability': None,
-                'no_vig_price': None,
-            }
-            negative_line = {
-                'name': first_line['name'],
-                'price': int(first_price),
-                'probability': None,
-                'no_vig_price': None,
-            }
+            positive_line = Line(second_line['name'], int(second_price))
+            negative_line = Line(first_line['name'], int(first_price))
 
     return positive_line, negative_line
+
+
+def calculate_probability(odds: int):
+    """
+    The goal here is to calculate the odds regardless of whether they are positive or negative.
+    :param odds:
+    :return:
+    """
+    if odds > 0:
+        odds = np.abs(odds)
+        return round(((100 / (odds + 100)) * 100), 2)
+    elif odds < 0:
+        odds = np.abs(odds)
+        return round(((odds / (odds + 100)) * 100), 2)
+
+
+def calculate_two_way_vig(negative_probability, positive_probability):
+    """
+    This is the new version of calculating the no vig odds and returning the juice.
+    :param negative_probability:
+    :param positive_probability:
+    :return vig, new_positive_price, new_negative_price:
+    """
+
+    total_implied = np.abs(negative_probability) + np.abs(positive_probability)
+
+    vig = (1 - ((1 / total_implied) * 100)) * 100
+    new_positive_probability = (positive_probability / total_implied) * 100
+    new_negative_probability = (negative_probability / total_implied) * 100
+
+    return round(new_negative_probability, 2), round(new_positive_probability, 2)
