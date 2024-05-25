@@ -1,0 +1,17 @@
+The following is a quick guide to git branches in this repository. There are three main types of branches. The first is
+the master branch. This is the branch that contains all review passing code that has been tested and reviewed. This is
+the branch that will eventually be lifted to production.
+
+The next main branch is the develop branch. This branch contains all pending changes and is where feature branches are
+pulled into to make sure that they are compatible. The develop branch is not where large features are built but it is
+where changes are organized and tested to work out any issues before pushing to master.
+
+Finally, there are feature branches. There are denoted "feature/branch-name". Each feature branch represents a new
+feature or functionality that is being added to the app. This allows for more protection for the develop branch and
+means that features can be developed individually and tested in a contained environment before a larger testing is
+done.
+
+For all new functionality that requires new files, create a feature branch. Small changes can be done on the develop
+branch is they do not require new files or directories. The goal here is to avoid rebases and other git conflicts that
+may arise. Finally, the feature branch "feature/mac-work" represents a branch for work done on another computer, not
+specifically a functionality.
