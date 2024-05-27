@@ -106,25 +106,30 @@ def lines_import_without_check(lines, cur):
 
 def compare_lines(first_line, second_line):
     """
-    The goal here is to take two lines and compare them, returning a positive line and a negative line
+    The goal here is to take two lines and compare them, returning a positive line and a negative line as a Line object
     :param first_line:
     :param second_line:
     :return positive_line, negative_line:
     """
 
-    positive_line = {}
-    negative_line = {}
+    positive_line = Line()
+    negative_line = Line()
 
-    first_price = first_line['price']
-    second_price = second_line['price']
-
-    if (first_price > 0 and second_price > 0) or (first_price < 0 and second_price < 0):
-        if first_price > second_price:
-            positive_line = Line(first_line['name'], int(first_price))
-            negative_line = Line(second_line['name'], int(second_price))
+    if (first_line['price'] is not None and second_line['price'] is not None) and (first_line['price'] != 0
+                                                                                   and second_line['price'] != 0):
+        if first_line['price'] > second_line['price']:
+            positive_line.set_name(first_line['name'])
+            positive_line.set_price(int(first_line['price']))
+            negative_line.set_name(second_line['name'])
+            negative_line.set_price(int(second_line['price']))
         else:
-            positive_line = Line(second_line['name'], int(second_price))
-            negative_line = Line(first_line['name'], int(first_price))
+            positive_line.set_name(second_line['name'])
+            positive_line.set_price(int(second_line['price']))
+            negative_line.set_name(first_line['name'])
+            negative_line.set_price(int(first_line['price']))
+    else:
+        print("Line Error:")
+        print("NoneType or Zero found.")
 
     return positive_line, negative_line
 

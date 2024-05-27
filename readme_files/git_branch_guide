@@ -12,6 +12,6 @@ means that features can be developed individually and tested in a contained envi
 done.
 
 For all new functionality that requires new files, create a feature branch. Small changes can be done on the develop
-branch is they do not require new files or directories. The goal here is to avoid rebases and other git conflicts that
-may arise. Finally, the feature branch "feature/mac-work" represents a branch for work done on another computer, not
+branch is they do not require new files or directories. The goal here is to avoid any need for a rebase and other git
+conflicts that may arise. Finally, the feature branch "feature/mac-work" represents a branch for work done on another computer, not
 specifically a functionality.
