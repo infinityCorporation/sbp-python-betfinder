@@ -1,9 +1,13 @@
 class Line:
     def __init__(self):
+        self.uid = None
+        # 0 for positive and 1 for negative
+        self.type = None
         self.name = None
         self.price = None
         self.probability = None
         self.no_vig_price = None
+        self.no_vig_probability = None
 
     def set_name(self, name):
         if name is not None:

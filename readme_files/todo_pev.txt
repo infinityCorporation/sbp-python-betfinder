@@ -1,0 +1,6 @@
+This is a to-do quide for the postive expected values development:
+ TODO:
+ - Each type of bet was split so that they can be processed on their own, finish off this processing line
+   for each of the given betting line types. This is totals, spreads, and money line.
+ - For the actual file, all that needs to be done is the line comparison, the value check, and then the storage into
+   the actual database that the client can pull from.

@@ -1,5 +1,6 @@
 # Library imports
 import json
+import uuid
 import numpy as np
 import http.client as client
 
@@ -71,13 +72,14 @@ def event_import_with_duplicate_check(markets, cur):
             cur.execute(delete_event_sql, (check_result[0],))
 
         # Regardless of whether there is a duplicate event, we will add the new event to make sure no data is missed
-        add_new_event_sql = ("INSERT INTO all_data (uid, event, commence_time, update_time, home_team, away_team, "
-                             "sport_key, sport_title, markets, bet_key) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, "
-                             "%s::json[], %s)")
-        insert_data = (x['uid'], x["event"], x['commence_time'], x['update_time'], x['home_team'], x['away_team'],
-                       x['sport_key'], x['sport_name'], [json.dumps(x['markets'])], x['bet_key'])
-        cur.execute(add_new_event_sql, insert_data)
-        print("Event Added: ", x['uid'])
+        if not (x['markets'] == [] or x['markets'] is None):
+            add_new_event_sql = ("INSERT INTO all_data (uid, event, commence_time, update_time, home_team, away_team, "
+                                 "sport_key, sport_title, markets, bet_key) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, "
+                                 "%s::json[], %s)")
+            insert_data = (x['uid'], x["event"], x['commence_time'], x['update_time'], x['home_team'], x['away_team'],
+                           x['sport_key'], x['sport_name'], [json.dumps(x['markets'])], x['bet_key'])
+            cur.execute(add_new_event_sql, insert_data)
+            print("Event Added: ", x['uid'])
 
 
 def lines_import_without_check(lines, cur):
@@ -111,6 +113,8 @@ def compare_lines(first_line, second_line):
     :param second_line:
     :return positive_line, negative_line:
     """
+    positive_uid = str(uuid.uuid4())
+    negative_uid = str(uuid.uuid4())
 
     positive_line = Line()
     negative_line = Line()
@@ -118,13 +122,17 @@ def compare_lines(first_line, second_line):
     if (first_line['price'] is not None and second_line['price'] is not None) and (first_line['price'] != 0
                                                                                    and second_line['price'] != 0):
         if first_line['price'] > second_line['price']:
+            positive_line.uid = positive_uid
             positive_line.set_name(first_line['name'])
             positive_line.set_price(int(first_line['price']))
+            negative_line.uid = negative_uid
             negative_line.set_name(second_line['name'])
             negative_line.set_price(int(second_line['price']))
         else:
+            positive_line.uid = positive_uid
             positive_line.set_name(second_line['name'])
             positive_line.set_price(int(second_line['price']))
+            negative_line.uid = negative_uid
             negative_line.set_name(first_line['name'])
             negative_line.set_price(int(first_line['price']))
     else:
@@ -134,18 +142,16 @@ def compare_lines(first_line, second_line):
     return positive_line, negative_line
 
 
-def calculate_probability(odds: int):
+def calculate_probability(odds):
     """
     The goal here is to calculate the odds regardless of whether they are positive or negative.
     :param odds:
     :return:
     """
     if odds > 0:
-        odds = np.abs(odds)
         return round(((100 / (odds + 100)) * 100), 2)
     elif odds < 0:
-        odds = np.abs(odds)
-        return round(((odds / (odds + 100)) * 100), 2)
+        return round(((abs(odds) / (abs(odds) + 100)) * 100), 2)
 
 
 def calculate_two_way_vig(negative_probability, positive_probability):
@@ -156,10 +162,15 @@ def calculate_two_way_vig(negative_probability, positive_probability):
     :return vig, new_positive_price, new_negative_price:
     """
 
-    total_implied = np.abs(negative_probability) + np.abs(positive_probability)
+    over_round = negative_probability + positive_probability
+    vig = (over_round - 100)
 
-    vig = (1 - ((1 / total_implied) * 100)) * 100
-    new_positive_probability = (positive_probability / total_implied) * 100
-    new_negative_probability = (negative_probability / total_implied) * 100
+    new_positive_probability = (positive_probability - (vig / 2))
+    new_negative_probability = (negative_probability - (vig / 2))
 
-    return round(new_negative_probability, 2), round(new_positive_probability, 2)
+    new_positive_price = (100 / (new_positive_probability / 100)) - 100
+    new_negative_price = - 100 / (1 - (new_negative_probability / 100)) + 100
+
+    return (abs(round(new_negative_probability, 2)), abs(round(new_positive_probability, 2)),
+            round(new_negative_price, 2), round(new_positive_price, 2))
+

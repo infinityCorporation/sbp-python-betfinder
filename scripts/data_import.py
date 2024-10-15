@@ -18,17 +18,11 @@ conn = create_api_connection()
 # Add the sports and market arrays
 # sports = ['americanfootball_nfl', 'americanfootball_ncaaf', 'basketball_nba', 'basketball_ncaab', 'baseball_mlb',
 #         'mma_mixed_martial_arts']
-# betting_markets = ['h2h', 'spreads', 'totals']
-sports = ['basketball_nba', 'basketball_ncaab']
+sports = ['basketball_nba', 'basketball_ncaab', 'baseball_mlb']
 betting_markets = ['h2h', 'spreads', 'totals']
+
 current_utc_time = datetime.now(timezone.utc)
 date_time = current_utc_time.strftime('%Y-%m-%dT%H:%M:%SZ')
-
-# sports = ['basketball_nba', 'basketball_ncaab']
-# betting_markets = ['h2h_q1', 'h2h_q2', 'h2h_q3', 'h2h_q4', 'h2h_h1', 'h2h_h2', 'spreads_q1', 'spreads_q2',
-#                   'spreads_q3', 'spreads_q4', 'spreads_h1', 'spreads_h2', 'totals_q1', 'totals_q2', 'totals_q3',
-#                   'totals_q4', 'totals_h1', 'totals_h2', ]
-
 
 # Initialize the necessary arrays
 all_markets = []
@@ -72,6 +66,9 @@ def games_loop_call(parsed_url, bet_key):
     :param bet_key:
     :return:
     """
+
+    # I think that the issue is that you are calling 3 api endpoints for each type of betting line, therefore,
+    # you are going to triple the number of duplicates
 
     # Loop through all returned json event objects for a given sport
     for a in parsed_url:
@@ -195,8 +192,8 @@ def get_data(connection, cur):
     # Call the utility to import all lines
     lines_import_without_check(all_lines, cur)
 
-    # Call the import for all alternative event markets
-    alternate_import(all_event_ids, cur)
+    # Call the import for all alternative event markets - Not always needed
+    # alternate_import(all_event_ids, cur)
 
     # Commit all database changes for data import and alternative import
     connection.commit()
