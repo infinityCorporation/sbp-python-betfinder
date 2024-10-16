@@ -1,10 +1,8 @@
 from flask import Flask, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
 import time
-from scripts.positiveev import run_script
 from scripts.data_import import get_data
 from scripts.arbitrage import arbitrage_main
-from scripts.pev import positive_ev_main
 from scripts.pev2 import ev_main
 import os
 import psycopg2
@@ -30,22 +28,6 @@ db_connection = psycopg2.connect(
 # - Save the processed information to separate database tables
 # - Sort for Arbitrage and Positive EV
 # - Return values upon called from server.py
-
-
-def update_bet_data():
-    """
-    Call the run function, run_script, from the main file to update the data regarding
-    the postive value bets.
-    :return:
-    """
-
-    cur = db_connection.cursor()
-
-    run_script(db_connection, cur)
-
-    cur.close()
-
-    print("The script was run at: ", time.strftime("%Y-%m-%d %H:%M:%S"))
 
 
 def pull_all_data_games():
@@ -81,15 +63,6 @@ def arbitrage_call():
     cur.close()
 
 
-def pev_call():
-
-    cur = db_connection.cursor()
-
-    positive_ev_main(db_connection, cur)
-
-    cur.close()
-
-
 def pev2_call():
 
     cur = db_connection.cursor()
@@ -111,12 +84,6 @@ def send_status():
     return jsonify({'status': 'up'})
 
 
-@app.route('/trigger-task', methods=['GET'])
-def trigger_task():
-    update_bet_data()
-    return jsonify({'message': 'Task triggered manually'})
-
-
 @app.route('/pull-data', methods=['GET'])
 def pull_data():
     pull_all_data_games()
@@ -136,12 +103,6 @@ def run_arbitrage():
 
 
 @app.route('/pev-test', methods=['GET'])
-def run_positiveev():
-    pev_call()
-    return jsonify({'message': 'The positive ev test has finished running.'})
-
-
-@app.route('/pev2', methods=['GET'])
 def test_pev():
     pev2_call()
     return jsonify({'message': 'The pev2 test has finished running. '})
