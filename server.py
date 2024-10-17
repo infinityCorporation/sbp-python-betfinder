@@ -13,12 +13,15 @@ app = Flask(__name__)
 
 
 def get_db_pool():
-    db_pool = psycopg2.pool.SimpleConnectionPool(minconn=1, maxconn=10,
-                                                 dbname='postgres',
-                                                 user='postgres',
-                                                 password='managerPass_02',
-                                                 host='bet-data.cr086aqucn7m.us-east-2.rds.amazonaws.com',
-                                                 port='5432')
+    db_pool = psycopg2.pool.SimpleConnectionPool(
+        minconn=1,
+        maxconn=10,
+        dbname='postgres',
+        user='postgres',
+        password='managerPass_02',
+        host='bet-data.cr086aqucn7m.us-east-2.rds.amazonaws.com',
+        port='5432'
+    )
     return db_pool.getconn()
 
 
@@ -105,7 +108,7 @@ def send_status():
 @app.route('/pull-data', methods=['GET'])
 def pull_data():
     pull_all_data_games()
-    return jsonify({'message': 'Task has been triggered.'})
+    return jsonify({'message': 'New data has been pulled from the API.'})
 
 
 @app.route('/run-stack', methods=['GET'])

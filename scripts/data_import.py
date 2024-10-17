@@ -12,7 +12,7 @@ from scripts.utilities import event_import_with_duplicate_check, lines_import_wi
 # contact@arrayassistant.ai: 098b369ca52dc641b2bea6c901c24887
 # efrisbie2232@gmail.com: cc1dcf7f444d59f7e4940113969b8e19
 
-apiKey = "cc1dcf7f444d59f7e4940113969b8e19"
+apiKey = "5ab51a74ab7fea2414dbade0cf9d7229"
 conn = create_api_connection()
 
 # Add the sports and market arrays
