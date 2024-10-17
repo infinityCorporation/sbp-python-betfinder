@@ -6,17 +6,18 @@ from scripts.arbitrage import arbitrage_main
 from scripts.pev2 import ev_main
 import os
 import psycopg2
+from psycopg2 import pool
 
 
 app = Flask(__name__)
 
-db_connection = psycopg2.connect(
-        dbname='postgres',
-        user='postgres',
-        password='managerPass_02',
-        host='bet-data.cr086aqucn7m.us-east-2.rds.amazonaws.com',
-        port='5432',
-    )
+db_pool = psycopg2.pool.SimpleConnectionPool(minconn=1, maxconn=10,
+                                             dbname='postgres',
+                                             user='postgres',
+                                             password='managerPass_02',
+                                             host='bet-data.cr086aqucn7m.us-east-2.rds.amazonaws.com',
+                                             port='5432')
+db_connection = db_pool.getconn()
 
 test_cur = db_connection.cursor()
 print("It works")
