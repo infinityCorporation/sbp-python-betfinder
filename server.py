@@ -11,6 +11,7 @@ from psycopg2 import pool
 
 app = Flask(__name__)
 
+
 def get_db_pool():
     db_pool = psycopg2.pool.SimpleConnectionPool(minconn=1, maxconn=10,
                                                  dbname='postgres',
@@ -19,6 +20,7 @@ def get_db_pool():
                                                  host='bet-data.cr086aqucn7m.us-east-2.rds.amazonaws.com',
                                                  port='5432')
     return db_pool.getconn()
+
 
 #New main flow:
 # - Import full bet list
@@ -41,6 +43,7 @@ def pull_all_data_games():
     cur = db_connection.cursor()
     get_data(db_connection, cur)
     cur.close()
+    db_connection.close()
 
 
 def main_stack():
@@ -52,6 +55,7 @@ def main_stack():
     ev_main(db_connection, cur)
 
     cur.close()
+    db_connection.close()
 
 
 def arbitrage_call():
@@ -59,6 +63,7 @@ def arbitrage_call():
     cur = db_connection.cursor()
     arbitrage_main(db_connection, cur)
     cur.close()
+    db_connection.close()
 
 
 def pev2_call():
@@ -66,6 +71,7 @@ def pev2_call():
     cur = db_connection.cursor()
     ev_main(cur, db_connection)
     cur.close()
+    db_connection.close()
 
 
 # Your function that performs the task
@@ -128,7 +134,5 @@ scheduler.start()
 
 if __name__ == '__main__':
     app.run(debug=True, port=int(os.environ.get('PORT', 8000)))
-
-db_connection.close()
 
 
