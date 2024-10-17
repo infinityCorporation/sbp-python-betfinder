@@ -35,16 +35,12 @@ def pull_all_data_games():
     This function is intended to assist the /pull-data endpoint.
     :return:
     """
-
     cur = db_connection.cursor()
-
     get_data(db_connection, cur)
-
     cur.close()
 
 
 def main_stack():
-
     cur = db_connection.cursor()
 
     get_data(db_connection, cur)
@@ -55,27 +51,32 @@ def main_stack():
 
 
 def arbitrage_call():
-
     cur = db_connection.cursor()
-
     arbitrage_main(db_connection, cur)
-
     cur.close()
 
 
 def pev2_call():
-
     cur = db_connection.cursor()
-
     ev_main(cur, db_connection)
-
     cur.close()
 
 
 # Your function that performs the task
 def run_task():
     # Perform the task here (e.g., running your Python script)
-    print("Task running at:", time.strftime("%Y-%m-%d %H:%M:%S"))
+    print("Main stack running at:", time.strftime("%Y-%m-%d %H:%M:%S"))
+    print("Main stack start... ")
+    print("----------------------------------------------------------------")
+    try:
+        run_full_stack()
+        print("----------------------------------------------------------------")
+        print("Main stack run successfully")
+        print("----------------------------------------------------------------")
+    except:
+        print("----------------------------------------------------------------")
+        print("Main stack encountered an error...")
+        print("----------------------------------------------------------------")
 
 
 # Endpoints
@@ -110,7 +111,7 @@ def test_pev():
 
 # Initializing scheduler for a 15-minute interval
 scheduler = BackgroundScheduler(daemon=True)
-scheduler.add_job(run_task, 'interval', minutes=15)
+scheduler.add_job(run_task, 'interval', minutes=480)
 scheduler.start()
 
 
