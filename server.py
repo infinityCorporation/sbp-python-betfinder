@@ -11,17 +11,14 @@ from psycopg2 import pool
 
 app = Flask(__name__)
 
-db_pool = psycopg2.pool.SimpleConnectionPool(minconn=1, maxconn=10,
-                                             dbname='postgres',
-                                             user='postgres',
-                                             password='managerPass_02',
-                                             host='bet-data.cr086aqucn7m.us-east-2.rds.amazonaws.com',
-                                             port='5432')
-db_connection = db_pool.getconn()
-
-test_cur = db_connection.cursor()
-print("It works")
-test_cur.close()
+def get_db_pool():
+    db_pool = psycopg2.pool.SimpleConnectionPool(minconn=1, maxconn=10,
+                                                 dbname='postgres',
+                                                 user='postgres',
+                                                 password='managerPass_02',
+                                                 host='bet-data.cr086aqucn7m.us-east-2.rds.amazonaws.com',
+                                                 port='5432')
+    return db_pool.getconn()
 
 #New main flow:
 # - Import full bet list
@@ -40,12 +37,14 @@ def pull_all_data_games():
     This function is intended to assist the /pull-data endpoint.
     :return:
     """
+    db_connection = get_db_pool()
     cur = db_connection.cursor()
     get_data(db_connection, cur)
     cur.close()
 
 
 def main_stack():
+    db_connection = get_db_pool()
     cur = db_connection.cursor()
 
     get_data(db_connection, cur)
@@ -56,12 +55,14 @@ def main_stack():
 
 
 def arbitrage_call():
+    db_connection = get_db_pool()
     cur = db_connection.cursor()
     arbitrage_main(db_connection, cur)
     cur.close()
 
 
 def pev2_call():
+    db_connection = get_db_pool()
     cur = db_connection.cursor()
     ev_main(cur, db_connection)
     cur.close()
@@ -87,7 +88,9 @@ def run_task():
 # Endpoints
 @app.route('/', methods=['GET'])
 def root():
-    return({"hello": "world"})
+    return jsonify({"hello": "world"})
+
+
 @app.route('/status', methods=['GET'])
 def send_status():
     return jsonify({'status': 'up'})
