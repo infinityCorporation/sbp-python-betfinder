@@ -80,6 +80,9 @@ def run_task():
 
 
 # Endpoints
+@app.route('/', methods=['GET'])
+def root():
+    return({"hello": "world"})
 @app.route('/status', methods=['GET'])
 def send_status():
     return jsonify({'status': 'up'})
