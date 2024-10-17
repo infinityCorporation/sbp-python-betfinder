@@ -18,6 +18,10 @@ db_connection = psycopg2.connect(
         port='5432',
     )
 
+test_cur = db_connection.cursor()
+print("It works")
+test_cur.close()
+
 #New main flow:
 # - Import full bet list
 # - Save it to database
