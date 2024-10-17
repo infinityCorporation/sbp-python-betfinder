@@ -111,7 +111,7 @@ def test_pev():
 
 # Initializing scheduler for a 15-minute interval
 scheduler = BackgroundScheduler(daemon=True)
-scheduler.add_job(run_task, 'interval', minutes=480)
+scheduler.add_job(run_task, 'interval', minutes=360)
 scheduler.start()
 
 
