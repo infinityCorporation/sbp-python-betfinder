@@ -2,3 +2,4 @@ flask
 apscheduler
 psycopg2
 numpy
+gunicorn
