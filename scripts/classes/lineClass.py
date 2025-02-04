@@ -8,6 +8,8 @@ class Line:
         self.probability = None
         self.no_vig_price = None
         self.no_vig_probability = None
+        self.team_one = None
+        self.team_two = None
 
     def set_name(self, name):
         if name is not None:
@@ -32,3 +34,7 @@ class Line:
         elif not price:
             print("Line Error:")
             print("price does not exist.")
+
+    def set_teams(self, team_one, team_two):
+        self.team_one = team_one
+        self.team_two = team_two

@@ -129,13 +129,12 @@ def test_pev():
     return jsonify({'message': 'The pev2 test has finished running. '})
 
 
-# Initializing scheduler for a 15-minute interval
 scheduler = BackgroundScheduler(daemon=True)
 scheduler.add_job(run_task, 'interval', minutes=360)
 scheduler.start()
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=int(os.environ.get('PORT', 8000)))
+    app.run(debug=True, port=int(os.environ.get('PORT', 8080)))
 
 

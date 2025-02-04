@@ -18,7 +18,7 @@ conn = create_api_connection()
 # Add the sports and market arrays
 # sports = ['americanfootball_nfl', 'americanfootball_ncaaf', 'basketball_nba', 'basketball_ncaab', 'baseball_mlb',
 #         'mma_mixed_martial_arts']
-sports = ['basketball_nba', 'basketball_ncaab', 'baseball_mlb']
+sports = ['basketball_nba', 'basketball_ncaab', 'baseball_mlb', 'americanfootball_nfl', 'americanfootball_ncaaf']
 betting_markets = ['h2h', 'spreads', 'totals']
 
 current_utc_time = datetime.now(timezone.utc)
@@ -119,6 +119,8 @@ def games_loop_call(parsed_url, bet_key):
                         'commence_time': commence_time,
                         'outcomes': outcomes,
                         'book': book,
+                        'team_one': a['home_team'],
+                        'team_two': a['away_team']
                     }
                     all_lines.append(line_object)
 

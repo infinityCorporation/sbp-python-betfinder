@@ -93,11 +93,12 @@ def lines_import_without_check(lines, cur):
 
     for y in lines:
         print("line:", y)
-        sql = ("INSERT INTO lines_data (uid, key, last_update, outcomes, commence_time, book) VALUES "
-               "(%s, %s, %s, %s::json[], %s, %s)")
+        sql = ("INSERT INTO lines_data (uid, key, last_update, outcomes, commence_time, book, team_one, team_two) VALUES "
+               "(%s, %s, %s, %s::json[], %s, %s, %s, %s)")
 
         try:
-            data = (y['uid'], y['key'], y['last_update'], [json.dumps(y['outcomes'])], y['commence_time'], y['book'])
+            data = (y['uid'], y['key'], y['last_update'], [json.dumps(y['outcomes'])], y['commence_time'], y['book'],
+                    y['team_one'], y['team_two'])
             cur.execute(sql, data)
         except:
             print("There was an error... ")

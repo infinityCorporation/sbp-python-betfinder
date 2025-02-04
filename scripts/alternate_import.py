@@ -79,6 +79,8 @@ def games_loop_call(parsed, bet_key):
                     'commence_time': commence_time,
                     'outcomes': outcomes,
                     'book': book_key,
+                    'team_one': parsed['home_team'],
+                    'team_two': parsed['away_team']
                 }
                 all_alt_lines.append(line_object)
 
