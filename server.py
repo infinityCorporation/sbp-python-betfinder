@@ -7,6 +7,9 @@ import psycopg2
 from psycopg2 import pool
 from flask import Flask, jsonify
 
+# The current issue is that flask and other required libraries are not being
+# installed properly during the build in the pipeline
+
 
 app = Flask(__name__)
 
