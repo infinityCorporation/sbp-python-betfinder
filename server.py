@@ -1,12 +1,11 @@
-from flask import Flask, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
 import time
 from scripts.data_import import get_data
 from scripts.arbitrage import arbitrage_main
 from scripts.pev2 import ev_main
-import os
 import psycopg2
 from psycopg2 import pool
+from flask import Flask, jsonify
 
 
 app = Flask(__name__)

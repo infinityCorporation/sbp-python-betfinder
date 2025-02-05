@@ -5,13 +5,14 @@ phases:
     runtime-versions:
       python: 3.11
     commands:
+      - echo "Installing dependencies"
       - pip install -r build/requirements.txt
   pre_build:
     commands:
       - echo "Dependencies installed"
   build:
     commands:
-      - echo "Starting the build"
+      - echo "Python WGSI, skipping build..."
   post_build:
     commands:
       - echo "Build complete, pushing to EC2"
