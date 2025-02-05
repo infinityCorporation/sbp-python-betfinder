@@ -6,7 +6,7 @@ phases:
       python: 3.11
     commands:
       - echo "Installing dependencies"
-      - /var/app/venv/staging-LQM1lest/bin/pip install -r build/requirements.txt
+      - var/app/venv/staging-LQM1lest/bin/pip install -r build/requirements.txt
   pre_build:
     commands:
       - echo "Dependencies installed"
