@@ -1,3 +1,7 @@
+import sys
+print("Python executable:", sys.executable)
+print("sys.path:", sys.path)
+
 from apscheduler.schedulers.background import BackgroundScheduler
 import time
 from scripts.data_import import get_data
