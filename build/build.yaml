@@ -7,6 +7,7 @@ phases:
     commands:
       - echo "Installing dependencies"
       - pip install -r build/requirements.txt --target=../venv/staging-LQM1lest/bin
+      - pip install -r build/requirements.txt --target=../venv/staging-LQM1lest/lib/python3.11/site-packages
   pre_build:
     commands:
       - echo "Dependencies installed"
