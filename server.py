@@ -1,7 +1,3 @@
-import sys
-print("Python executable:", sys.executable)
-print("sys.path:", sys.path)
-
 from apscheduler.schedulers.background import BackgroundScheduler
 import time
 from scripts.data_import import get_data
@@ -10,9 +6,7 @@ from scripts.pev2 import ev_main
 import psycopg2
 from psycopg2 import pool
 from flask import Flask, jsonify
-
-# The current issue is that flask and other required libraries are not being
-# installed properly during the build in the pipeline
+import os
 
 
 app = Flask(__name__)
@@ -24,7 +18,7 @@ def get_db_pool():
         maxconn=10,
         dbname='postgres',
         user='postgres',
-        password='managerPass_02',
+        password=os.environ["bet_db_pass"],
         host='bet-data.cr086aqucn7m.us-east-2.rds.amazonaws.com',
         port='5432'
     )
