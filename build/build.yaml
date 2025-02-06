@@ -6,6 +6,7 @@ phases:
       python: 3.11
     commands:
       - echo "Installing dependencies"
+      - sudo yum install postgresql-devel
       - pip install -r build/requirements.txt --target=../venv/staging-LQM1lest/bin
       - pip install -r build/requirements.txt --target=../venv/staging-LQM1lest/lib/python3.11/site-packages
   pre_build:
