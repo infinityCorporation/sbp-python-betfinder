@@ -8,6 +8,11 @@ from psycopg2 import pool
 from flask import Flask, jsonify
 import os
 
+# Looks like its still too much for aws computers
+# You could attempt to run get data on its own
+# You could also check for memory leaks or any memory replications
+# that could be ballooning the size of the memory needed
+
 
 app = Flask(__name__)
 
@@ -42,9 +47,14 @@ def pull_all_data_games():
     This function is intended to assist the /pull-data endpoint.
     :return:
     """
+    print("Get Data is running, setting up connections...")
     db_connection = get_db_pool()
     cur = db_connection.cursor()
+
+    print("Calling the main function...")
     get_data(db_connection, cur)
+
+    print("Closing existing connections!")
     cur.close()
     db_connection.close()
 
