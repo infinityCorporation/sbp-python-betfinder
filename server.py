@@ -110,6 +110,7 @@ def run_task():
 # Endpoints
 @app.route('/', methods=['GET'])
 def root():
+    print("Base route called...")
     return jsonify({"hello": "world"})
 
 
