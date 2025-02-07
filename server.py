@@ -18,7 +18,7 @@ def get_db_pool():
         maxconn=10,
         dbname='postgres',
         user='postgres',
-        password=os.environ["bet_db_pass"],
+        password=os.environ['bet_db_pass'],
         host='bet-data.cr086aqucn7m.us-east-2.rds.amazonaws.com',
         port='5432'
     )
@@ -50,13 +50,16 @@ def pull_all_data_games():
 
 
 def main_stack():
+    print("The main stack is beginning to run...")
     db_connection = get_db_pool()
     cur = db_connection.cursor()
 
+    print("Calling the main functions now...")
     get_data(db_connection, cur)
     arbitrage_main(db_connection, cur)
     ev_main(db_connection, cur)
 
+    print("Closing the existing connections!")
     cur.close()
     db_connection.close()
 
@@ -113,6 +116,7 @@ def pull_data():
 
 @app.route('/run-stack', methods=['GET'])
 def run_full_stack():
+    print("The main stack was called")
     main_stack()
     return jsonify({'message': 'The Main Stack has finished running.'})
 
