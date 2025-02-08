@@ -1,20 +1,11 @@
-from apscheduler.schedulers.background import BackgroundScheduler
-import time
 from scripts.data_import import get_data
 from scripts.arbitrage import arbitrage_main
 from scripts.pev2 import ev_main
 import psycopg2
 from psycopg2 import pool
-from flask import Flask, jsonify
-import os
 
-# Looks like its still too much for aws computers
-# You could attempt to run get data on its own
-# You could also check for memory leaks or any memory replications
-# that could be ballooning the size of the memory needed
-
-
-app = Flask(__name__)
+# The new approach is to back this down from a python web server
+# to a simple python program running on a hosted instance
 
 
 def get_db_pool():
@@ -23,23 +14,11 @@ def get_db_pool():
         maxconn=10,
         dbname='postgres',
         user='postgres',
-        password=os.environ['bet_db_pass'],
+        password="managerPass_02",
         host='bet-data.cr086aqucn7m.us-east-2.rds.amazonaws.com',
         port='5432'
     )
     return db_pool.getconn()
-
-
-#New main flow:
-# - Import full bet list
-# - Save it to database
-# - Call the data in rotating order to the following:
-#   - Arbitrage
-#   - Positive EV
-#   - Scanner
-# - Save the processed information to separate database tables
-# - Sort for Arbitrage and Positive EV
-# - Return values upon called from server.py
 
 
 def pull_all_data_games():
@@ -55,21 +34,6 @@ def pull_all_data_games():
     get_data(db_connection, cur)
 
     print("Closing existing connections!")
-    cur.close()
-    db_connection.close()
-
-
-def main_stack():
-    print("The main stack is beginning to run...")
-    db_connection = get_db_pool()
-    cur = db_connection.cursor()
-
-    print("Calling the main functions now...")
-    get_data(db_connection, cur)
-    arbitrage_main(db_connection, cur)
-    ev_main(db_connection, cur)
-
-    print("Closing the existing connections!")
     cur.close()
     db_connection.close()
 
@@ -90,67 +54,26 @@ def pev2_call():
     db_connection.close()
 
 
-# Your function that performs the task
-def run_task():
-    # Perform the task here (e.g., running your Python script)
-    print("Main stack running at:", time.strftime("%Y-%m-%d %H:%M:%S"))
-    print("Main stack start... ")
-    print("----------------------------------------------------------------")
-    try:
-        run_full_stack()
-        print("----------------------------------------------------------------")
-        print("Main stack run successfully")
-        print("----------------------------------------------------------------")
-    except:
-        print("----------------------------------------------------------------")
-        print("Main stack encountered an error...")
-        print("----------------------------------------------------------------")
+def main():
+    """
+    This function will be the calling point to run the main stack
+    :return:
+    """
+    print("The main stack is beginning to run...")
+    db_connection = get_db_pool()
+    cur = db_connection.cursor()
+
+    print("Calling the main functions now...")
+    get_data(db_connection, cur)
+    arbitrage_main(db_connection, cur)
+    ev_main(db_connection, cur)
+
+    print("Closing the existing connections!")
+    cur.close()
+    db_connection.close()
 
 
-# Endpoints
-@app.route('/', methods=['GET'])
-def root():
-    print("Base route called...")
-    return jsonify({"hello": "world"})
-
-
-@app.route('/status', methods=['GET'])
-def send_status():
-    return jsonify({'status': 'up'})
-
-
-@app.route('/pull-data', methods=['GET'])
-def pull_data():
-    pull_all_data_games()
-    return jsonify({'message': 'New data has been pulled from the API.'})
-
-
-@app.route('/run-stack', methods=['GET'])
-def run_full_stack():
-    print("The main stack was called")
-    main_stack()
-    return jsonify({'message': 'The Main Stack has finished running.'})
-
-
-@app.route('/arb-test', methods=['GET'])
-def run_arbitrage():
-    arbitrage_call()
-    return jsonify({'message': 'The arbitrage test has finished running.'})
-
-
-@app.route('/pev-test', methods=['GET'])
-def test_pev():
-    pev2_call()
-    return jsonify({'message': 'The pev2 test has finished running. '})
-
-
-scheduler = BackgroundScheduler(daemon=True)
-scheduler.add_job(run_task, 'interval', minutes=360)
-scheduler.start()
-
-
-if __name__ == '__main__':
-    app.run(debug=True, port=8000)
+main()
 
 
 
