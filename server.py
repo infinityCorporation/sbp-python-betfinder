@@ -4,8 +4,14 @@ from scripts.pev2 import ev_main
 import psycopg2
 from psycopg2 import pool
 
-# The new approach is to back this down from a python web server
-# to a simple python program running on a hosted instance
+# To Get this all running you need to...
+# - Connect the code pipeline up with code deploy to ec2 (you left of with fixing the
+#   us-east-1 agent and moving it to use-east-2)
+# - Confirm that the program is working as expected within ec2
+# - Create a cron job that will allow the program to run every hour on the hour (more
+#   can be added later)
+# - Finally, do some general code cleaning and attempt to prep the program for
+#   a production ready version.
 
 
 def get_db_pool():
