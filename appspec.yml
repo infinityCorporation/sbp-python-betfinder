@@ -3,7 +3,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /var/app/propicks-data-api
+    destination: /var/app/current
 hooks:
   AfterInstall:
     - location: scripts/shell/restart_server.sh
