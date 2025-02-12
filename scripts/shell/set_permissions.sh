@@ -1,3 +1,3 @@
 #!/bin/bash
-chmod +x ./restart_server.sh
-chmod +x ./cleanup.sh
+chmod +x /var/app/current/scripts/shell/restart_server.sh
+chmod +x /var/app/current/scripts/shell/cleanup.sh
