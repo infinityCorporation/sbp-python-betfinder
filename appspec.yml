@@ -1,0 +1,15 @@
+version: 0.1
+
+os: linux
+files:
+  - source: /
+    destination: /var/app/propicks-data-api
+hooks:
+  AfterInstall:
+    - location: scripts/shell/restart_server.sh
+      timeout: 300
+      runas: ec2-user
+    - location: scripts/shell/set_permissions.sh
+      timeout: 60
+      runas: ec2-user
+
