@@ -1,2 +1,2 @@
 #!/bin/bash
-chmod +x /var/app/propicks-data-api/scripts/shell/restart_server.sh
+chmod +x /var/app/current/scripts/shell/restart_server.sh

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Navigate to the application directory
-cd /var/app/propicks-data-api
+cd /var/app/current
 
 # Activate the virtual environment
 source /var/app/venv/bin/activate
