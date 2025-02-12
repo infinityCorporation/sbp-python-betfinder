@@ -7,6 +7,7 @@ from psycopg2 import pool
 # Goal now is to set up cron jobs
 
 def get_db_pool():
+    print("Getting db pool...")
     db_pool = psycopg2.pool.SimpleConnectionPool(
         minconn=1,
         maxconn=10,
@@ -16,6 +17,7 @@ def get_db_pool():
         host='bet-data.cr086aqucn7m.us-east-2.rds.amazonaws.com',
         port='5432'
     )
+    print("Db pool found...")
     return db_pool.getconn()
 
 
