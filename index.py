@@ -4,8 +4,7 @@ from scripts.pev2 import ev_main
 import psycopg2
 from psycopg2 import pool
 
-# The final goal is just to get the pipeline working, just need
-# the code deploy agent to work out
+# Goal now is to set up cron jobs
 
 def get_db_pool():
     db_pool = psycopg2.pool.SimpleConnectionPool(
