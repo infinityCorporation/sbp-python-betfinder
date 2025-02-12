@@ -4,12 +4,12 @@
 cd /var/app/current
 
 # Activate the virtual environment
-source /var/app/venv/bin/activate
+source /var/app/venv/staging-LQM1lest/bin/activate
 
 sudo yum install postgresql-devel
 
 # Install any missing dependencies
-/var/app/staging-LQM1lest/bin/pip install -r requirements.txt
+/var/app/staging-LQM1lest/bin/pip install -r /var/app/current/build/requirements.txt
 
 # Stop any existing process using the server
 sudo pkill -f index.py
