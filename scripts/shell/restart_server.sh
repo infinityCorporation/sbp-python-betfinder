@@ -10,10 +10,10 @@ source /var/app/venv/bin/activate
 pip install -r requirements.txt
 
 # Stop any existing process using the server
-sudo pkill -f server.py
+sudo pkill -f index.py
 
 # Start the application inside the virtual environment
-nohup python3 server.py > app.log 2>&1 &
+nohup python3 index.py > app.log 2>&1 &
 
 echo "Application restarted successfully!"
 
