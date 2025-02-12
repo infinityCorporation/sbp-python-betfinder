@@ -15,7 +15,7 @@ sudo yum install postgresql-devel
 echo "got here 3"
 
 # Install any missing dependencies
-/var/app/staging-LQM1lest/bin/pip install -r /var/app/current/build/requirements.txt
+/var/app/venv/staging-LQM1lest/bin/pip install -r /var/app/current/build/requirements.txt
 
 echo "got here 4"
 
