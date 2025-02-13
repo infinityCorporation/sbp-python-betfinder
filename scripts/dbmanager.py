@@ -69,7 +69,6 @@ def check_bet_time(cursor):
     try:
         while True:
             result = cursor.fetchone()
-            print(result)
 
             if result is None:
                 break
@@ -105,7 +104,6 @@ def check_bet_time_v2(cursor, database_table):
     cursor.execute(get_all)
 
     results = cursor.fetchall()
-    print(results)
 
     for row in results:
         print("Checking timing of event... ")
