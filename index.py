@@ -3,8 +3,12 @@ from scripts.arbitrage import arbitrage_main
 from scripts.pev2 import ev_main
 import psycopg2
 from psycopg2 import pool
+import os
 
 # Goal now is to set up cron jobs
+
+
+sports = ['basketball_nba', 'basketball_ncaab', 'baseball_mlb', 'americanfootball_nfl', 'americanfootball_ncaaf']
 
 def get_db_pool():
     print("Getting db pool...")
@@ -65,8 +69,12 @@ def main():
 
     print("Calling the main functions now...")
     get_data(db_connection, cur)
-    arbitrage_main(db_connection, cur)
-    ev_main(db_connection, cur)
+    # arbitrage_main(db_connection, cur)
+    # ev_main(db_connection, cur)
+
+    print("Deleting the local data stored in the local files")
+    for sport in sports:
+        os.remove("./scripts/data_store/" + sport)
 
     print("Closing the existing connections!")
     cur.close()

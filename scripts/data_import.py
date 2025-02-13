@@ -2,6 +2,7 @@
 import uuid
 from datetime import datetime, timezone
 import json
+import os
 
 # Script imports
 from scripts.dbmanager import check_bet_time_v2
@@ -181,6 +182,12 @@ def get_data(connection, cur):
             response = conn.getresponse()
             content = response.read()
             parsed = json.loads(content)
+
+            file_path = "./scripts/data_store/" + s
+
+            # Write the data to the file
+            with open(file_path, "w") as file:
+                file.write(str(parsed))
 
             print(parsed)
 
