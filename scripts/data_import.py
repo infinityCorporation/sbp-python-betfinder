@@ -176,20 +176,19 @@ def get_data(connection, cur):
     # This grabs all the lines from the api and pushes them to the all_markets array
     for s in sports:
         for m in betting_markets:
-            url = "/v4/sports/" + s + "/odds/?regions=us&oddsFormat=american&markets=" + m + "&apiKey=" + apiKey
+            url = f"/v4/sports/{s}/odds/?regions=us&oddsFormat=american&markets={m}&apiKey={apiKey}"
             conn.request("GET", url)
-
             response = conn.getresponse()
-            content = response.read()
-            parsed = json.loads(content)
 
-            file_path = "./scripts/data_store/" + s
+            # requests.Response object; to read content:
+            content = response.content
+            parsed = response.json()
 
-            # Write the data to the file
-            with open(file_path, "w") as file:
-                file.write(str(parsed))
+#            file_path = f"./scripts/data_store/{s}"
+#            with open(file_path, "w") as file:
+#                file.write(str(parsed))
 
-            print(parsed)
+            # print(parsed)
 
             games_loop_call(parsed, m)
 

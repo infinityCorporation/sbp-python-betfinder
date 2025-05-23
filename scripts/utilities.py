@@ -3,21 +3,32 @@ import json
 import uuid
 import numpy as np
 import http.client as client
+import ssl
+import requests
 
 # Class references
 from scripts.classes.lineClass import Line
 
+import requests
+
+class APIConnection:
+    def __init__(self, base_url="https://api.the-odds-api.com"):
+        self.session = requests.Session()
+        self.base_url = base_url
+        self.response = None
+
+    def request(self, method, path, **kwargs):
+        # If path starts with '/', remove it to avoid double slash
+        if path.startswith("/"):
+            path = path[1:]
+        url = f"{self.base_url}/{path}"
+        self.response = self.session.request(method, url, **kwargs)
+
+    def getresponse(self):
+        return self.response
 
 def create_api_connection():
-    """
-    This function creates an HTTPS connection with the API that provides the sports betting data.
-    :return:
-    """
-
-    host = "api.the-odds-api.com"
-    conn = client.HTTPSConnection(host)
-
-    return conn
+    return APIConnection()
 
 
 def pull_event_lines(event):

@@ -100,6 +100,9 @@ def check_bet_time_v2(cursor, database_table):
     """
     expired = []
 
+    # Don't need to do it like this... can do
+    query = "DELETE FROM " + database_table + "WHERE commence_time < "
+
     get_all = "SELECT * FROM " + database_table + ";"
     cursor.execute(get_all)
 
