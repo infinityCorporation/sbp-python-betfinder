@@ -54,93 +54,14 @@ def check_odds_change(data_object, cursor):
         cursor.execute(sql_delete, search_data)
 
 
-def check_bet_time(cursor):
+def check_bet_time_v3(cursor, database_table):
     """
-    To keep the database clean, old bets where the event has passed should be found and deleted. That is the purpose
-    of this function. (Note that all database management functions should be moved to a separate file.)
-    :param cursor:
-    :return:
+    Deletes expired rows from the given database table based on the current UTC time.
     """
+    if database_table not in ("lines_data", "all_data"):
+        raise ValueError("Invalid table name. Must be 'lines_data' or 'all_data'.")
 
-    sql_search = "SELECT * FROM bet_data"
-
-    cursor.execute(sql_search)
-
-    try:
-        while True:
-            result = cursor.fetchone()
-
-            if result is None:
-                break
-
-            commence_time = result[9]
-
-            commence_value = datetime.strptime(commence_time, '%Y-%m-%dT%H:%M:%SZ')
-            current_value = datetime.strptime(date_time, '%Y-%m-%dT%H:%M:%SZ')
-
-            if commence_value < current_value:
-                key_value = (result[0],)
-                delete_sql = "DELETE FROM bet_data WHERE id = %s"
-
-                cursor.execute(delete_sql, key_value)
-
-                print("An expired value was found and deleted")
-
-    except psycopg2.Error as e:
-        print("An error occurred:", e)
-
-
-def check_bet_time_v2(cursor, database_table):
-    """
-    This is a new version of the previous check_bet_time management function. It has the same functionality but an all
-    new looping algorithm that should be more stable and throw less errors.
-    :param cursor:
-    :param database_table:
-    :return:
-    """
-    expired = []
-
-    # Don't need to do it like this... can do
-    query = "DELETE FROM " + database_table + "WHERE commence_time < "
-
-    get_all = "SELECT * FROM " + database_table + ";"
-    cursor.execute(get_all)
-
-    results = cursor.fetchall()
-
-    for row in results:
-        print("Checking timing of event... ")
-
-        if database_table == "lines_data":
-            commence_time = row[4]
-        elif database_table == "all_data":
-            commence_time = row[2]
-
-        commence_value = datetime.strptime(commence_time, '%Y-%m-%dT%H:%M:%SZ')
-        current_value = datetime.strptime(date_time, '%Y-%m-%dT%H:%M:%SZ')
-
-        # Remember that this is not based on the update_time stored in the database but rather
-        # it is based on the actual current time value that python pulls.
-        latest = max((commence_value, current_value))
-        print(latest)
-        print(row)
-
-        if latest == current_value:
-            print(" - - - Found an Expired Event - - - ")
-            expired.append(row[0])
-        elif latest == commence_value:
-            print("This event's time value checks out. Moving onto the next ->")
-
-    print(expired)
-
-    for y in expired:
-        print(y)
-        if database_table == "lines_data":
-            delete_all = "DELETE FROM lines_data WHERE uid LIKE %s;"
-            cursor.execute(delete_all, (y,))
-            print("A lines row may have been deleted... UID: " + y)
-        elif database_table == "all_data":
-            delete_all = "DELETE FROM all_data WHERE uid LIKE %s;"
-            cursor.execute(delete_all, (y,))
-            print("A data row may have been deleted... UID: " + y)
-
+    # Execute a DELETE query where commence_time has passed
+    query = f"DELETE FROM {database_table} WHERE commence_time < %s;"
+    cursor.execute(query, (date_time,))
+    print(f"Expired entries deleted from {database_table}.")

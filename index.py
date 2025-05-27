@@ -72,9 +72,9 @@ def main():
     # arbitrage_main(db_connection, cur)
     # ev_main(db_connection, cur)
 
-    print("Deleting the local data stored in the local files")
-    for sport in sports:
-        os.remove("./scripts/data_store/" + sport)
+#    print("Deleting the local data stored in the local files")
+#    for sport in sports:
+#        os.remove("./scripts/data_store/" + sport)
 
     print("Closing the existing connections!")
     cur.close()

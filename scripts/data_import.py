@@ -5,7 +5,7 @@ import json
 import os
 
 # Script imports
-from scripts.dbmanager import check_bet_time_v2
+from scripts.dbmanager import check_bet_time_v2, check_bet_time_v3
 from scripts.alternate_import import alternate_import
 from scripts.utilities import event_import_with_duplicate_check, lines_import_without_check, create_api_connection
 
@@ -55,8 +55,8 @@ def clean_up_prep(cursor):
     :param cursor:
     :return:
     """
-    check_bet_time_v2(cursor, "lines_data")
-    check_bet_time_v2(cursor, "all_data")
+    check_bet_time_v3(cursor, "lines_data")
+    check_bet_time_v3(cursor, "all_data")
 
 
 def games_loop_call(parsed_url, bet_key):
@@ -72,8 +72,8 @@ def games_loop_call(parsed_url, bet_key):
     # you are going to triple the number of duplicates
 
     # Loop through all returned json event objects for a given sport
+    # (a) is an event here
     for a in parsed_url:
-
         try:
             uid = str(uuid.uuid4())
             event_id = a['id']
@@ -121,7 +121,8 @@ def games_loop_call(parsed_url, bet_key):
                         'outcomes': outcomes,
                         'book': book,
                         'team_one': a['home_team'],
-                        'team_two': a['away_team']
+                        'team_two': a['away_team'],
+                        'event': event,
                     }
                     all_lines.append(line_object)
 
