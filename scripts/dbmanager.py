@@ -65,3 +65,14 @@ def check_bet_time_v3(cursor, database_table):
     query = f"DELETE FROM {database_table} WHERE commence_time < %s;"
     cursor.execute(query, (date_time,))
     print(f"Expired entries deleted from {database_table}.")
+
+def clear_bet_table(cursor, database_table):
+    """
+    Clears the table to enter the new lines and event rows.
+    :param cursor:
+    :param database_table:
+    :return:
+    """
+
+    delete_query = f"DELETE FROM {database_table};"
+    cursor.execute(delete_query)

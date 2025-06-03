@@ -69,12 +69,6 @@ def main():
 
     print("Calling the main functions now...")
     get_data(db_connection, cur)
-    # arbitrage_main(db_connection, cur)
-    # ev_main(db_connection, cur)
-
-#    print("Deleting the local data stored in the local files")
-#    for sport in sports:
-#        os.remove("./scripts/data_store/" + sport)
 
     print("Closing the existing connections!")
     cur.close()

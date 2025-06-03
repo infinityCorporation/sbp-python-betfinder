@@ -9,24 +9,19 @@ from scripts.utilities import pull_event_lines
 import uuid
 
 
-def line_manager(cur):
+def line_manager(cur, all_markets, all_lines):
     """
     This is essentially a function meant to pull an event, or two in this case, and then get their lines such that they
     can be compared.
     :param cur:
+    :param all_markets:
+    :param all_lines:
     :return:
     """
 
     total_array = []
 
-    pull_all_sql = "SELECT * FROM all_data"
-    cur.execute(pull_all_sql)
-
-    all_array = cur.fetchall()
-
-    # New plan, we are now creating an array of arrays. The uid of the event and all the line UIDs
-
-    for event in all_array:
+    for event in all_markets:
 
         positive_array = []
         negative_array = []
@@ -37,28 +32,48 @@ def line_manager(cur):
 
             search_lines_sql = "SELECT * FROM lines_data WHERE uid = %s"
             cur.execute(search_lines_sql, (line,))
-
             returned_line = cur.fetchone()
 
             if returned_line:
-                for outcome in returned_line[3][0]:
-                    if outcome['price'] > 0:
-                        positive_array.append({
-                            'uid': returned_line[0],
-                            'name': outcome['name'],
-                            'price': outcome['price'],
-                            'book': returned_line[5],
-                        })
-                    elif outcome['price'] < 0:
-                        negative_array.append({
-                            'uid': returned_line[0],
-                            'name': outcome['name'],
-                            'price': outcome['price'],
-                            'book': returned_line[5],
-                        })
+                if returned_line[1] == 'h2h':
+                    for outcome in returned_line[3][0]:
+                        if outcome['price'] > 0:
+                            positive_array.append({
+                                'uid': returned_line[0],
+                                'name': outcome['name'],
+                                'price': outcome['price'],
+                                'book': returned_line[5],
+                            })
+                        elif outcome['price'] < 0:
+                            negative_array.append({
+                                'uid': returned_line[0],
+                                'name': outcome['name'],
+                                'price': outcome['price'],
+                                'book': returned_line[5],
+                            })
+                else:
+                    for outcome in returned_line[3][0]:
+                        if outcome['price'] > 0:
+                            positive_array.append({
+                                'uid': returned_line[0],
+                                'name': outcome['name'],
+                                'price': outcome['price'],
+                                'point': outcome['point'],
+                                'book': returned_line[5],
+                            })
+                        elif outcome['price'] < 0:
+                            negative_array.append({
+                                'uid': returned_line[0],
+                                'name': outcome['name'],
+                                'price': outcome['price'],
+                                'point': outcome['point'],
+                                'book': returned_line[5],
+                            })
+
 
         total_array.append({
-            "event_uid": event[0],
+            "event_uid": event['uid'],
+            "key": event['bet_key'],
             "positive_lines": positive_array,
             "negative_lines": negative_array,
         })
@@ -68,26 +83,36 @@ def line_manager(cur):
 
     return total_array
 
+# need to return list of objects with form event uid, positive lines, negative lines
 
-def calculate_arbitrage(positive_odds, negative_odds):
+
+def calculate_arbitrage(odds1, odds2):
     """
-    For arbitrage, given two lines, you are essentially calculating if between them there is an arbitrage play
-    :param positive_odds:
-    :param negative_odds:
-    :return arbitrage_percentage:
+    Calculates arbitrage opportunity between two American odds.
+
+    :param odds1: First line (can be positive or negative)
+    :param odds2: Second line (can be positive or negative)
+    :return: (arbitrage_percentage, is_arbitrage)
     """
 
-    # First take the 100s and turn them into decimals
-    positive_odds = (positive_odds / 100) + 1
-    negative_odds = (100 / (-negative_odds)) + 1
+    def to_decimal(odds):
+        if odds > 0:
+            return (odds / 100) + 1
+        else:
+            return (100 / abs(odds)) + 1
 
-    positive = (1 / positive_odds) * 100
-    negative = (1 / negative_odds) * 100
+    dec1 = to_decimal(odds1)
+    dec2 = to_decimal(odds2)
 
-    # Now calculate whether there is an arbitrage percentage
-    arbitrage_percentage = 100 - (positive + negative)
+    inv1 = 1 / dec1
+    inv2 = 1 / dec2
 
-    return arbitrage_percentage
+    total_inverse = inv1 + inv2
+    arbitrage_percentage = (1 - total_inverse) * 100
+    is_arbitrage = total_inverse < 1
+
+    return round(arbitrage_percentage, 4), is_arbitrage
+
 
 
 def calculate_arbitrage_stake(positive_odds, negative_odds):
@@ -108,7 +133,7 @@ def calculate_arbitrage_stake(positive_odds, negative_odds):
 
 def arbitrage_loop(total_array):
     """
-    The purpose of this function is two bring together the arrays from the lines manager as well as the calculations
+    The purpose of this function is to bring together the arrays from the lines manager as well as the calculations
     from the arbitrage calculator. Will return an array of available arbitrage plays.
     :param total_array:
     :return arbitrage_plays:
@@ -121,20 +146,31 @@ def arbitrage_loop(total_array):
         negative_arr = event['negative_lines']
 
         if len(positive_arr) > 0:
-
             for p in positive_arr:
                 for n in negative_arr:
 
-                    percentage = calculate_arbitrage(p['price'], n['price'])
+                    percentage, is_arb = calculate_arbitrage(p['price'], n['price'])
 
-                    if percentage > 0:
-                        print("Positive Percentage: ", percentage)
-                        arbitrage_plays.append({
-                            "event_uid": event['event_uid'],
-                            "positive": p,
-                            "negative": n,
-                            "play_percentage": percentage,
-                        })
+                    if event['key'] == 'h2h':
+                        if is_arb and p['name'] != n['name']:
+                            print("Positive Percentage: ", percentage)
+                            arbitrage_plays.append({
+                                "event_uid": event['event_uid'],
+                                "positive": p,
+                                "negative": n,
+                                "play_percentage": percentage,
+                            })
+                    else:
+                        if is_arb and p['name'] != n['name'] and abs(p['point']) != abs(n['point']):
+                            print("Point mismatch found: ", p['point'], " - ", n['point'])
+                        if is_arb and p['name'] != n['name'] and abs(p['point']) == abs(n['point']):
+                            print("Positive Percentage: ", percentage)
+                            arbitrage_plays.append({
+                                "event_uid": event['event_uid'],
+                                "positive": p,
+                                "negative": n,
+                                "play_percentage": percentage,
+                            })
 
     return arbitrage_plays
 
@@ -198,15 +234,20 @@ def create_final_table(plays, cur):
         cur.execute(sql_table_insert, table_insert_data)
 
 
-def arbitrage_main(connection, cursor):
+def arbitrage_main(connection, cursor, all_markets, all_lines):
     """
     This is the main function that pulls together the calculations and data management aspects of the arbitrage
     calculator
+    :param connection:
+    :param cursor:
+    :param all_markets:
+    :param all_lines:
     :return:
     """
 
     # This is the main arbitrage stack
-    total = line_manager(cursor)
+    # total = line_manager(cursor)
+    total = line_manager(cursor, all_markets, all_lines)
     all_plays = arbitrage_loop(total)
     create_final_table(all_plays, cursor)
 

@@ -4,10 +4,11 @@ from datetime import datetime, timezone
 import json
 import os
 
+from scripts.arbitrage import arbitrage_main
 # Script imports
-from scripts.dbmanager import check_bet_time_v2, check_bet_time_v3
-from scripts.alternate_import import alternate_import
-from scripts.utilities import event_import_with_duplicate_check, lines_import_without_check, create_api_connection
+from scripts.dbmanager import clear_bet_table
+from scripts.pev2 import ev_main
+from scripts.utilities import event_import_without_duplicate_check, lines_import_without_check, create_api_connection
 
 # frisbiecorp@gmail.com: 5ab51a74ab7fea2414dbade0cf9d7229
 # contact@arrayassistant.ai: 098b369ca52dc641b2bea6c901c24887
@@ -19,8 +20,9 @@ conn = create_api_connection()
 # Add the sports and market arrays
 # sports = ['americanfootball_nfl', 'americanfootball_ncaaf', 'basketball_nba', 'basketball_ncaab', 'baseball_mlb',
 #         'mma_mixed_martial_arts']
-sports = ['basketball_nba', 'basketball_ncaab', 'baseball_mlb', 'americanfootball_nfl', 'americanfootball_ncaaf']
+sports = ['icehockey_nhl', 'basketball_nba', 'basketball_ncaab', 'baseball_mlb', 'americanfootball_nfl', 'americanfootball_ncaaf']
 betting_markets = ['h2h', 'spreads', 'totals']
+regions = ["us", "us2"]
 
 current_utc_time = datetime.now(timezone.utc)
 date_time = current_utc_time.strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -55,8 +57,10 @@ def clean_up_prep(cursor):
     :param cursor:
     :return:
     """
-    check_bet_time_v3(cursor, "lines_data")
-    check_bet_time_v3(cursor, "all_data")
+
+    # Delete all
+    clear_bet_table(cursor, "lines_data")
+    clear_bet_table(cursor, "all_data")
 
 
 def games_loop_call(parsed_url, bet_key):
@@ -74,6 +78,8 @@ def games_loop_call(parsed_url, bet_key):
     # Loop through all returned json event objects for a given sport
     # (a) is an event here
     for a in parsed_url:
+        print("working on ", a)
+
         try:
             uid = str(uuid.uuid4())
             event_id = a['id']
@@ -86,15 +92,7 @@ def games_loop_call(parsed_url, bet_key):
             sport_name = a['sport_title']
             markets = []
 
-            # Add all ids and sport keys for alternative imports
-            if not all_event_ids.__contains__({
-                'id': a['id'],
-                'key': a['sport_key'],
-            }):
-                all_event_ids.append({
-                    'id': a['id'],
-                    'key': a['sport_key'],
-                })
+
 
             # Loop through each bookmaker for a given event
             for x in a["bookmakers"]:
@@ -134,23 +132,94 @@ def games_loop_call(parsed_url, bet_key):
                 }
                 markets.append(bookmaker_object)
 
-            # Finally, create an object with all the event's information
-            event_object = {
-                'uid': uid,
-                'id': event_id,
-                'event': event,
-                'commence_time': commence_time,
-                'update_time': update_time,
-                'home_team': home_team,
-                'away_team': away_team,
-                'sport_key': sport_key,
-                'sport_name': sport_name,
-                'markets': markets,
-                'bet_key': bet_key,
-            }
+            existing_event = next((
+                e for e in all_markets
+                if e['home_team'] == home_team and
+                   e['away_team'] == away_team and
+                   e['commence_time'] == commence_time and
+                   e['bet_key'] == bet_key
+            ), None)
 
-            print(event_object)
-            all_markets.append(event_object)
+            if existing_event:
+                existing_event['markets'].extend(markets)
+            else:
+                event_object = {
+                    'uid': uid,
+                    'id': a['id'],
+                    'event': event,
+                    'commence_time': commence_time,
+                    'update_time': update_time,
+                    'home_team': home_team,
+                    'away_team': away_team,
+                    'sport_key': sport_key,
+                    'sport_name': sport_name,
+                    'markets': markets,
+                    'bet_key': bet_key,
+                }
+                print(event_object)
+                all_markets.append(event_object)
+
+        except NameError:
+            print("The line with the error was: ")
+            print(json.dumps(a))
+        except TypeError:
+            print("There was a type err here: ")
+            print(json.dumps(a))
+
+def games_loop_call_v2(parsed_url, bet_key):
+    for a in parsed_url:
+        print("working on ", a)
+
+        try:
+            uid = str(uuid.uuid4())
+            event = a['home_team'] + " vs " + a['away_team']
+            commence_time = a['commence_time']
+            update_time = date_time
+            home_team = a['home_team']
+            away_team = a['away_team']
+            sport_key = a['sport_key']
+            sport_name = a['sport_title']
+            markets = []
+
+            # Add to all_event_ids for tracking
+            if not any(e['id'] == a['id'] and e['key'] == sport_key for e in all_event_ids):
+                all_event_ids.append({'id': a['id'], 'key': sport_key})
+
+            # Loop through bookmakers
+            for x in a["bookmakers"]:
+                book = x['key']
+                book_title = x['title']
+                lines = []
+
+                for y in x['markets']:
+                    line_id = str(uuid.uuid4())  # generate per line
+                    key = y['key']
+                    last_update = y['last_update']
+                    outcomes = y['outcomes']
+
+                    line_object = {
+                        'uid': line_id,
+                        'key': key,
+                        'last_update': last_update,
+                        'commence_time': commence_time,
+                        'outcomes': outcomes,
+                        'book': book,
+                        'team_one': home_team,
+                        'team_two': away_team,
+                        'event': event,
+                    }
+                    all_lines.append(line_object)
+                    lines.append(line_id)  # add to list
+
+                bookmaker_object = {
+                    'book': book,
+                    'title': book_title,
+                    'lines': lines,
+                }
+                markets.append(bookmaker_object)
+
+            # MATCH BASED ON event equivalence (not event_id!)
+
 
         except NameError:
             print("The line with the error was: ")
@@ -177,29 +246,29 @@ def get_data(connection, cur):
     # This grabs all the lines from the api and pushes them to the all_markets array
     for s in sports:
         for m in betting_markets:
-            url = f"/v4/sports/{s}/odds/?regions=us&oddsFormat=american&markets={m}&apiKey={apiKey}"
-            conn.request("GET", url)
-            response = conn.getresponse()
+            parsed_array = []
 
-            # requests.Response object; to read content:
-            content = response.content
-            parsed = response.json()
+            for r in regions:
+                url = f"/v4/sports/{s}/odds/?regions={r}&oddsFormat=american&markets={m}&apiKey={apiKey}"
+                conn.request("GET", url)
 
-#            file_path = f"./scripts/data_store/{s}"
-#            with open(file_path, "w") as file:
-#                file.write(str(parsed))
+                response = conn.getresponse()
+                parsed = response.json()
+                for x in parsed:
+                    parsed_array.append(x)
+                print(r, " ", len(parsed_array))
 
-            # print(parsed)
-
-            games_loop_call(parsed, m)
-
-            print("all_markets Array: ", all_markets)
+            games_loop_call(parsed_array, m)
 
     # Call the utility to import all events with duplicate check
-    event_import_with_duplicate_check(all_markets, cur)
+    event_import_without_duplicate_check(all_markets, cur)
 
     # Call the utility to import all lines
     lines_import_without_check(all_lines, cur)
+
+    # arbitrage_main(connection, cur)
+    arbitrage_main(connection, cur, all_markets, all_lines)
+    ev_main(connection, cur, all_markets, all_lines)
 
     # Call the import for all alternative event markets - Not always needed
     # alternate_import(all_event_ids, cur)

@@ -19,28 +19,24 @@ from scripts.classes.outcomeClass import Outcome
 
 # First, grab all the lines of a given event and store them in an array that allows all of them to be accessed for that
 # specific event
-def line_manager(cur):
+def line_manager(cur, all_markets, all_lines):
     """
     This new version of the line manager attempts to get all the lines of an event into two arrays within an event
     object
     :param cur:
+    :param all_markets:
+    :param all_lines:
     :return:
     """
 
     total_array = []
 
-    # Consider, at some point in the future, moving this to a stored procedure
-    pull_all_sql = "SELECT * FROM all_data"
-    cur.execute(pull_all_sql)
-
-    all_array = cur.fetchall()
-
-    for event in all_array:
+    for event in all_markets:
 
         pair_array = []
 
-        home_team = event[4]
-        away_team = event[5]
+        home_team = event['home_team']
+        away_team = event['away_team']
 
         lines = pull_event_lines(event)
 
@@ -57,7 +53,7 @@ def line_manager(cur):
                 pair_array.append(outcome_object)
 
         if len(pair_array) > 0:
-            total_array.append(Event(event[0], event[1], event[2], event[7], home_team, away_team, pair_array))
+            total_array.append(Event(event['uid'], event['event'], event['commence_time'], event['sport_name'], home_team, away_team, pair_array))
 
     return total_array
 
@@ -117,7 +113,7 @@ def pev_main_loop(events, cur):
                 positive_play_price = outcome.line_with_pev.price
                 positive_play_name = outcome.line_with_pev.name
                 positive_play_percentage = outcome.positive_ev_percentage
-                sport, book = event.sport, outcome.book
+                sport, book, bet_type = event.sport, outcome.book, outcome.bet_type
                 if outcome.line_with_pev == outcome.negative_line:
                     opposing_play_price = outcome.positive_line.price
                 else:
@@ -128,11 +124,11 @@ def pev_main_loop(events, cur):
                 pev_insert_command = ("INSERT INTO pev_data (uid, event_uid, event, home_team, away_team, "
                                       "commence_time, positive_play_price, positive_play_name, "
                                       "positive_play_percentage, sport, book, opposing_play_price, "
-                                      "no_vig_probability, pev_line_probability) VALUES (%s, %s, %s, %s, %s,"
-                                      " %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+                                      "no_vig_probability, pev_line_probability, bet_type) VALUES (%s, %s, %s, %s, %s,"
+                                      " %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
                 pev_insert_data = (uid, event_uid, event_name, home_team, away_team, commence_time, positive_play_price,
                                    positive_play_name, positive_play_percentage, sport, book, opposing_play_price,
-                                   no_vig_probability, pev_line_probability)
+                                   no_vig_probability, pev_line_probability, bet_type)
                 cur.execute(pev_insert_command, pev_insert_data)
 
     print("The total number of positive ev plays was: ", total_pev_index, "/", total_outcome_index)
@@ -147,16 +143,21 @@ def pev_main_loop(events, cur):
 # Finally, check to see which lines have a positive expected value from any of the lines.
 
 
-def ev_main(connection, cursor):
+def ev_main(connection, cursor, all_markets, all_lines):
     """
     This is the main file function that manages the interaction with the server file as well as the database connections
     :param cursor:
     :param connection:
+    :param all_markets:
+    :param all_lines:
     :return:
     """
 
+    pev_table_delete_sql = "DELETE FROM pev_data"
+    cursor.execute(pev_table_delete_sql)
+
     # First, call the line manager to get the events and sort the lines
-    event_array = line_manager(cursor)
+    event_array = line_manager(cursor, all_markets, all_lines)
 
     # Next, call the main loop to complete the functionality
     pev_main_loop(event_array, cursor)
