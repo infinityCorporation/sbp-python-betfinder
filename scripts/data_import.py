@@ -2,27 +2,34 @@
 import uuid
 from datetime import datetime, timezone
 import json
-import os
 
+from scripts.alternate_import import betting_markets
 from scripts.arbitrage import arbitrage_main
-# Script imports
 from scripts.dbmanager import clear_bet_table
 from scripts.pev2 import ev_main
-from scripts.utilities import event_import_without_duplicate_check, lines_import_without_check, create_api_connection
+from scripts.utilities import event_import_v2, lines_import_v2, create_api_connection
 
 # frisbiecorp@gmail.com: 5ab51a74ab7fea2414dbade0cf9d7229
 # contact@arrayassistant.ai: 098b369ca52dc641b2bea6c901c24887
 # efrisbie2232@gmail.com: cc1dcf7f444d59f7e4940113969b8e19
 
-apiKey = "5ab51a74ab7fea2414dbade0cf9d7229"
+# pro key frisbiecorp@gmail.com: c95efda5321b24d2bbb587407b6d0012
+
+apiKey = "c95efda5321b24d2bbb587407b6d0012"
 conn = create_api_connection()
 
 # Add the sports and market arrays
-# sports = ['americanfootball_nfl', 'americanfootball_ncaaf', 'basketball_nba', 'basketball_ncaab', 'baseball_mlb',
-#         'mma_mixed_martial_arts']
-sports = ['icehockey_nhl', 'basketball_nba', 'basketball_ncaab', 'baseball_mlb', 'americanfootball_nfl', 'americanfootball_ncaaf']
-betting_markets = ['h2h', 'spreads', 'totals']
+sports = ['icehockey_nhl', 'basketball_nba', 'basketball_wnba', 'basketball_ncaab', 'baseball_mlb',
+          'americanfootball_nfl', 'mma_mixed_martial_arts', 'americanfootball_ncaaf', 'boxing_boxing', 'icehockey_ahl']
+default_markets = {'h2h', 'totals', 'spreads'}
+betting_markets = ['h2h', 'totals', 'spreads']
 regions = ["us", "us2"]
+
+supported_markets = {
+    'mma_mixed_martial_arts': {'h2h'},
+    'boxing_boxing': {'h2h'},
+    # Other sports default to all markets unless specified
+}
 
 current_utc_time = datetime.now(timezone.utc)
 date_time = current_utc_time.strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -43,13 +50,6 @@ all_event_ids = []
 #               - [Object] Team Name and Odds
 
 
-# The start method should be as follows:
-# - Check the timing of existing bets
-# - Pull new bets
-#   - Check all events and then the corresponding lines against existing bets
-# - Send confirmation to other processors that import is complete
-
-
 def clean_up_prep(cursor):
     """
     This functions purpose is to clean up the database and prep it for another data pull. The idea is to clear any
@@ -65,73 +65,54 @@ def clean_up_prep(cursor):
 
 def games_loop_call(parsed_url, bet_key):
     """
-    This function takes in the raw data from the API, but doesn't actually pull it, and sorts it into an array that can
-    actually be used in the program.
-    :param parsed_url:
-    :param bet_key:
-    :return:
+    Sorts API event data into structured event and line objects for internal processing.
+    :param parsed_url: Parsed JSON data from API.
+    :param bet_key: Identifier for bet type (e.g., spreads, totals, h2h).
     """
-
-    # I think that the issue is that you are calling 3 api endpoints for each type of betting line, therefore,
-    # you are going to triple the number of duplicates
-
-    # Loop through all returned json event objects for a given sport
-    # (a) is an event here
-    for a in parsed_url:
-        print("working on ", a)
+    for event_data in parsed_url:
+        print("working on", event_data)
 
         try:
             uid = str(uuid.uuid4())
-            event_id = a['id']
-            event = a['home_team'] + " vs " + a['away_team']
-            commence_time = a['commence_time']
+            event_id = event_data['id']
+            home_team = event_data['home_team']
+            away_team = event_data['away_team']
+            commence_time = event_data['commence_time']
+            event_name = f"{home_team} vs {away_team}"
+            sport_key = event_data['sport_key']
+            sport_name = event_data['sport_title']
             update_time = date_time
-            home_team = a['home_team']
-            away_team = a['away_team']
-            sport_key = a['sport_key']
-            sport_name = a['sport_title']
             markets = []
 
+            # Process each bookmaker
+            for bookmaker in event_data["bookmakers"]:
+                book = bookmaker['key']
+                book_title = bookmaker['title']
+                line_uid = str(uuid.uuid4())
 
-
-            # Loop through each bookmaker for a given event
-            for x in a["bookmakers"]:
-                id_creator = str(uuid.uuid4())
-
-                book = x['key']
-                book_title = x['title']
-                lines = id_creator
-
-                # Loop through each line in the bookmaker's markets
-                for y in x['markets']:
-
-                    line_id = id_creator
-                    key = y['key']
-                    last_update = y['last_update']
-                    outcomes = y['outcomes']
-
-                    # Create a single line object for each line
+                # Process each market under this bookmaker
+                for market in bookmaker['markets']:
                     line_object = {
-                        'uid': line_id,
-                        'key': key,
-                        'last_update': last_update,
+                        'uid': line_uid,
+                        'key': market['key'],
+                        'last_update': market['last_update'],
                         'commence_time': commence_time,
-                        'outcomes': outcomes,
+                        'outcomes': market['outcomes'],
                         'book': book,
-                        'team_one': a['home_team'],
-                        'team_two': a['away_team'],
-                        'event': event,
+                        'team_one': home_team,
+                        'team_two': away_team,
+                        'event': event_name,
                     }
                     all_lines.append(line_object)
 
-                # Create an object for each book's info and all lines
-                bookmaker_object = {
+                # Associate this bookmaker’s lines
+                markets.append({
                     'book': book,
                     'title': book_title,
-                    'lines': lines,
-                }
-                markets.append(bookmaker_object)
+                    'lines': line_uid,
+                })
 
+            # Check for existing event to merge markets
             existing_event = next((
                 e for e in all_markets
                 if e['home_team'] == home_team and
@@ -143,10 +124,10 @@ def games_loop_call(parsed_url, bet_key):
             if existing_event:
                 existing_event['markets'].extend(markets)
             else:
-                event_object = {
+                all_markets.append({
                     'uid': uid,
-                    'id': a['id'],
-                    'event': event,
+                    'id': event_id,
+                    'event': event_name,
                     'commence_time': commence_time,
                     'update_time': update_time,
                     'home_team': home_team,
@@ -155,78 +136,12 @@ def games_loop_call(parsed_url, bet_key):
                     'sport_name': sport_name,
                     'markets': markets,
                     'bet_key': bet_key,
-                }
-                print(event_object)
-                all_markets.append(event_object)
+                })
 
-        except NameError:
-            print("The line with the error was: ")
-            print(json.dumps(a))
-        except TypeError:
-            print("There was a type err here: ")
-            print(json.dumps(a))
-
-def games_loop_call_v2(parsed_url, bet_key):
-    for a in parsed_url:
-        print("working on ", a)
-
-        try:
-            uid = str(uuid.uuid4())
-            event = a['home_team'] + " vs " + a['away_team']
-            commence_time = a['commence_time']
-            update_time = date_time
-            home_team = a['home_team']
-            away_team = a['away_team']
-            sport_key = a['sport_key']
-            sport_name = a['sport_title']
-            markets = []
-
-            # Add to all_event_ids for tracking
-            if not any(e['id'] == a['id'] and e['key'] == sport_key for e in all_event_ids):
-                all_event_ids.append({'id': a['id'], 'key': sport_key})
-
-            # Loop through bookmakers
-            for x in a["bookmakers"]:
-                book = x['key']
-                book_title = x['title']
-                lines = []
-
-                for y in x['markets']:
-                    line_id = str(uuid.uuid4())  # generate per line
-                    key = y['key']
-                    last_update = y['last_update']
-                    outcomes = y['outcomes']
-
-                    line_object = {
-                        'uid': line_id,
-                        'key': key,
-                        'last_update': last_update,
-                        'commence_time': commence_time,
-                        'outcomes': outcomes,
-                        'book': book,
-                        'team_one': home_team,
-                        'team_two': away_team,
-                        'event': event,
-                    }
-                    all_lines.append(line_object)
-                    lines.append(line_id)  # add to list
-
-                bookmaker_object = {
-                    'book': book,
-                    'title': book_title,
-                    'lines': lines,
-                }
-                markets.append(bookmaker_object)
-
-            # MATCH BASED ON event equivalence (not event_id!)
-
-
-        except NameError:
-            print("The line with the error was: ")
-            print(json.dumps(a))
-        except TypeError:
-            print("There was a type err here: ")
-            print(json.dumps(a))
+        except (NameError, TypeError) as e:
+            print("Error while processing event:")
+            print(json.dumps(event_data, indent=2))
+            print(f"Exception: {e}")
 
 
 def get_data(connection, cur):
@@ -239,14 +154,17 @@ def get_data(connection, cur):
     :return:
     """
 
-    clean_up_prep(cur)
     connection.commit()
-    print("Clean up complete...")
 
     # This grabs all the lines from the api and pushes them to the all_markets array
     for s in sports:
+        valid_markets = supported_markets.get(s, default_markets)
+
         for m in betting_markets:
             parsed_array = []
+
+            if m not in valid_markets:
+                continue
 
             for r in regions:
                 url = f"/v4/sports/{s}/odds/?regions={r}&oddsFormat=american&markets={m}&apiKey={apiKey}"
@@ -260,13 +178,15 @@ def get_data(connection, cur):
 
             games_loop_call(parsed_array, m)
 
+    # Clean up just before import, not when the program starts
+    clean_up_prep(cur)
+
     # Call the utility to import all events with duplicate check
-    event_import_without_duplicate_check(all_markets, cur)
+    event_import_v2(all_markets, cur)
 
     # Call the utility to import all lines
-    lines_import_without_check(all_lines, cur)
+    lines_import_v2(all_lines, cur)
 
-    # arbitrage_main(connection, cur)
     arbitrage_main(connection, cur, all_markets, all_lines)
     ev_main(connection, cur, all_markets, all_lines)
 

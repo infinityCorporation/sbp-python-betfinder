@@ -66,6 +66,7 @@ def check_bet_time_v3(cursor, database_table):
     cursor.execute(query, (date_time,))
     print(f"Expired entries deleted from {database_table}.")
 
+
 def clear_bet_table(cursor, database_table):
     """
     Clears the table to enter the new lines and event rows.

@@ -1,19 +1,12 @@
-# This is the arbitrage file for the calculations and the returning the values to the arbitrage values. The general
-# math seems pretty simple the main thing here is being able to work with the new lines data management system.
-
-# Arbitrage still needs:
-#   - Bet sizing in terms of #'s
-#   - A Table in the database to store final row values
-
 from scripts.utilities import pull_event_lines
 import uuid
+from psycopg2.extras import execute_values
 
 
-def line_manager(cur, all_markets, all_lines):
+def line_manager(all_markets, all_lines):
     """
     This is essentially a function meant to pull an event, or two in this case, and then get their lines such that they
     can be compared.
-    :param cur:
     :param all_markets:
     :param all_lines:
     :return:
@@ -30,44 +23,42 @@ def line_manager(cur, all_markets, all_lines):
 
         for line in lines:
 
-            search_lines_sql = "SELECT * FROM lines_data WHERE uid = %s"
-            cur.execute(search_lines_sql, (line,))
-            returned_line = cur.fetchone()
+            returned_line = next((bet for bet in all_lines if bet['uid'] == line), None)
 
             if returned_line:
-                if returned_line[1] == 'h2h':
-                    for outcome in returned_line[3][0]:
+                if returned_line['key'] == 'h2h':
+                    for outcome in returned_line['outcomes']:
                         if outcome['price'] > 0:
                             positive_array.append({
-                                'uid': returned_line[0],
+                                'uid': returned_line['uid'],
                                 'name': outcome['name'],
                                 'price': outcome['price'],
-                                'book': returned_line[5],
+                                'book': returned_line['book'],
                             })
                         elif outcome['price'] < 0:
                             negative_array.append({
-                                'uid': returned_line[0],
+                                'uid': returned_line['uid'],
                                 'name': outcome['name'],
                                 'price': outcome['price'],
-                                'book': returned_line[5],
+                                'book': returned_line['book'],
                             })
                 else:
-                    for outcome in returned_line[3][0]:
+                    for outcome in returned_line['outcomes']:
                         if outcome['price'] > 0:
                             positive_array.append({
-                                'uid': returned_line[0],
+                                'uid': returned_line['uid'],
                                 'name': outcome['name'],
                                 'price': outcome['price'],
                                 'point': outcome['point'],
-                                'book': returned_line[5],
+                                'book': returned_line['book'],
                             })
                         elif outcome['price'] < 0:
                             negative_array.append({
-                                'uid': returned_line[0],
+                                'uid': returned_line['uid'],
                                 'name': outcome['name'],
                                 'price': outcome['price'],
                                 'point': outcome['point'],
-                                'book': returned_line[5],
+                                'book': returned_line['book'],
                             })
 
 
@@ -82,8 +73,6 @@ def line_manager(cur, all_markets, all_lines):
         print(event['event_uid'], " : ", event['positive_lines'], " : ", event['negative_lines'])
 
     return total_array
-
-# need to return list of objects with form event uid, positive lines, negative lines
 
 
 def calculate_arbitrage(odds1, odds2):
@@ -175,6 +164,47 @@ def arbitrage_loop(total_array):
     return arbitrage_plays
 
 
+def arbitrage_bulk_insert(complete_arbitrage_table, cur):
+    """
+    Bulk insert arbitrage opportunities into the arbitrage_data table using execute_values.
+    """
+    sql = """
+    INSERT INTO arbitrage_data (
+        uid, event_uid, event, home_team, away_team, commence_time,
+        sport, positive_play_price, positive_play_name, positive_play_book, positive_play_stake,
+        negative_play_price, negative_play_name, negative_play_book, negative_play_stake,
+        arbitrage_percentage, bet_type
+    ) VALUES %s
+    """
+
+    values = [
+        (
+            row['uid'],
+            row['event_uid'],
+            row['game'],  # 'game' is mapped to 'event' in table
+            row['home_team'],
+            row['away_team'],
+            row['commence_time'],
+            row['sport'],
+            row['positive_play_price'],
+            row['positive_play_name'],
+            row['positive_play_book'],
+            row['positive_play_stake'],
+            row['negative_play_price'],
+            row['negative_play_name'],
+            row['negative_play_book'],
+            row['negative_play_stake'],
+            row['arb_percent'],
+            row['bet_type'],
+        )
+        for row in complete_arbitrage_table
+    ]
+
+    execute_values(cur, sql, values)
+    print(f"{len(values)} arbitrage records inserted.")
+
+
+
 def create_final_table(plays, cur):
     """
     Given the array of plays with the associated UIDs
@@ -220,18 +250,7 @@ def create_final_table(plays, cur):
 
     complete_arbitrage_table.sort(key=lambda x: x['arb_percent'], reverse=True)
 
-    for row in complete_arbitrage_table:
-        sql_table_insert = ("INSERT INTO arbitrage_data (uid, event_uid, event, home_team, away_team, commence_time, "
-                            "sport, positive_play_price, positive_play_name, positive_play_book, positive_play_stake, "
-                            "negative_play_price, negative_play_name, negative_play_book, negative_play_stake, "
-                            "arbitrage_percentage, bet_type) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, "
-                            "%s, %s)")
-        table_insert_data = (row['uid'], row['event_uid'], row['game'], row['home_team'], row['away_team'],
-                             row['commence_time'], row['sport'], row['positive_play_price'], row['positive_play_name'],
-                             row['positive_play_book'], row['positive_play_stake'], row['negative_play_price'],
-                             row['negative_play_name'], row['negative_play_book'], row['negative_play_stake'],
-                             row['arb_percent'], row['bet_type'])
-        cur.execute(sql_table_insert, table_insert_data)
+    arbitrage_bulk_insert(complete_arbitrage_table, cur)
 
 
 def arbitrage_main(connection, cursor, all_markets, all_lines):
@@ -245,9 +264,7 @@ def arbitrage_main(connection, cursor, all_markets, all_lines):
     :return:
     """
 
-    # This is the main arbitrage stack
-    # total = line_manager(cursor)
-    total = line_manager(cursor, all_markets, all_lines)
+    total = line_manager(all_markets, all_lines)
     all_plays = arbitrage_loop(total)
     create_final_table(all_plays, cursor)
 

@@ -5,6 +5,9 @@ import numpy as np
 import http.client as client
 import ssl
 import requests
+from psycopg2.extras import execute_values, Json
+from psycopg2.extensions import AsIs
+
 
 # Class references
 from scripts.classes.lineClass import Line
@@ -48,42 +51,69 @@ def pull_event_lines(event):
     return lines
 
 
-def event_import_without_duplicate_check(markets, cur):
+def event_import_v2(markets, cur):
     """
-    Used in the data import files, this function first checks for duplicates, which are deleted if found, then it stores
-    the event in the data table "all_data"
-    :param markets:
-    :param cur:
-    :return:
+    Bulk inserts event data into the all_data table, assuming markets is now a JSONB column.
     """
-
-    for x in markets:
-        add_new_event_sql = ("INSERT INTO all_data (uid, event, commence_time, update_time, home_team, away_team, "
-                             "sport_key, sport_title, markets, bet_key) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, "
-                             "%s::json[], %s)")
-        insert_data = (x['uid'], x["event"], x['commence_time'], x['update_time'], x['home_team'], x['away_team'],
-                       x['sport_key'], x['sport_name'], [json.dumps(x['markets'])], x['bet_key'])
-        cur.execute(add_new_event_sql, insert_data)
-        print("Event Added: ", x['uid'])
-
-def lines_import_without_check(lines, cur):
-    """
-    Due to the fact that 'event_import_with_duplicate_check' checks lines as well, this function just imports all given
-    lines into the 'all_lines' table
-    :param lines:
-    :param cur:
-    :return:
+    sql = """
+    INSERT INTO all_data (
+        uid, event, commence_time, update_time, home_team, away_team,
+        sport_key, sport_title, markets, bet_key
+    ) VALUES %s
     """
 
-    for y in lines:
-        sql = ("INSERT INTO lines_data (uid, key, last_update, outcomes, commence_time, book, team_one, team_two, event) VALUES "
-               "(%s, %s, %s, %s::json[], %s, %s, %s, %s, %s)")
+    values = [
+        (
+            x['uid'],
+            x["event"],
+            x['commence_time'],
+            x['update_time'],
+            x['home_team'],
+            x['away_team'],
+            x['sport_key'],
+            x['sport_name'],
+            Json(x['markets']),  # Now a clean single JSONB object
+            x['bet_key']
+        )
+        for x in markets
+    ]
 
-        data = (y['uid'], y['key'], y['last_update'], [json.dumps(y['outcomes'])], y['commence_time'], y['book'],
-                y['team_one'], y['team_two'], y['event'])
-        cur.execute(sql, data)
+    execute_values(cur, sql, values)
+    print(f"{len(values)} events added.")
 
-        print("Line Added: ", y['uid'])
+
+def lines_import_v2(lines, cur):
+    """
+    Bulk insert line objects into the 'lines_data' table using execute_values for efficiency.
+    """
+    sql = """ INSERT INTO lines_data ( uid, key, last_update, outcomes, commence_time, book, team_one, team_two, event
+    ) VALUES %s
+    """
+
+
+    def adapt_json_array(outcomes):
+        # Create a properly escaped PostgreSQL array string like:
+        # '{"{\"name\": \"Win\", \"price\": 120}" , "{\"name\": \"Lose\", \"price\": -140}"}'
+        return "{" + ",".join(json.dumps(o).replace('"', '\\"').replace("'", "''") for o in outcomes) + "}"
+
+    # Prepare the data as a list of tuples
+    values = [
+        (
+            y['uid'],
+            y['key'],
+            y['last_update'],
+            Json(y['outcomes']),
+            y['commence_time'],
+            y['book'],
+            y['team_one'],
+            y['team_two'],
+            y['event'],
+        )
+        for y in lines
+    ]
+
+    execute_values(cur, sql, values)
+    print(f"{len(values)} lines added.")
 
 
 def compare_lines(first_line, second_line):

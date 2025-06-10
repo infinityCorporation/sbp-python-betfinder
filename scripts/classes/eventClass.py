@@ -110,12 +110,10 @@ class Event:
         """
         if len(self.array_h2h) > 0:
             for outcome in self.array_h2h:
-                if (outcome.positive_line.no_vig_probability < self.average_positive_probability_h2h and
-                        outcome.positive_line.no_vig_price > self.average_positive_h2h):
+                if outcome.positive_line.no_vig_price > self.average_positive_h2h:
                     outcome.line_with_pev = outcome.positive_line
                     self.positive_ev_outcomes.append(outcome)
-                elif (outcome.negative_line.no_vig_probability < self.average_negative_probability_h2h and
-                      outcome.negative_line.no_vig_price > self.average_negative_h2h):
+                elif outcome.negative_line.no_vig_price > self.average_negative_h2h:
                     outcome.line_with_pev = outcome.negative_line
                     self.positive_ev_outcomes.append(outcome)
 
@@ -187,9 +185,6 @@ class Event:
         This method calls the internal methods to process the calculations for a given event
         :return:
         """
-        print("---------------------------------")
-        print("Processing Event: ", self.event)
-        print("---------------------------------")
 
         try:
             self.sort_pairs()

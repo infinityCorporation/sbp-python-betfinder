@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 import json
 
 # Utility imports
-from scripts.utilities import event_import_with_duplicate_check, lines_import_without_check, create_api_connection
+from scripts.utilities import create_api_connection
 
 
 # Initialize arrays for alternative market keys
