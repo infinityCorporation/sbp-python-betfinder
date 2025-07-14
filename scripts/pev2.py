@@ -99,7 +99,6 @@ def pev_main_loop(events, cur):
 
     # First, process the event. This process each outcome, the +/- arrays, and the averages
     for event in events:
-        total_pev_index = 0
         event.process_event()
 
         print("Average no vig: ")
@@ -118,9 +117,9 @@ def pev_main_loop(events, cur):
 
         if event.positive_ev_outcomes:
             prob_map = {
-                'h2h': (event.average_positive_probability_h2h, event.average_negative_probability_h2h),
-                'totals': (event.average_positive_probability_totals, event.average_negative_probability_totals),
-                'spreads': (event.average_positive_probability_spreads, event.average_negative_probability_spreads)
+                'h2h': (event.average_positive_probability_h2h, (event.average_negative_probability_h2h)),
+                'totals': (event.average_positive_probability_totals, (event.average_negative_probability_totals)),
+                'spreads': (event.average_positive_probability_spreads, (event.average_negative_probability_spreads))
             }
 
             for outcome in event.positive_ev_outcomes:
@@ -140,7 +139,7 @@ def pev_main_loop(events, cur):
                     "commence_time": event.commence_time,
                     "positive_play_price": outcome.line_with_pev.price,
                     "positive_play_name": outcome.line_with_pev.name,
-                    "positive_play_percentage": outcome.positive_ev_percentage,
+                    "positive_play_percentage": abs(outcome.positive_ev_percentage),
                     "sport": event.sport,
                     "book": outcome.book,
                     "opposing_play_price": opposing_play_price,
@@ -148,7 +147,7 @@ def pev_main_loop(events, cur):
                     "pev_line_probability": outcome.line_with_pev.probability,
                     "bet_type": outcome.bet_type,
                     "avg_positive_prob": avg_positive_prob,
-                    "avg_negative_prob": avg_negative_prob,
+                    "avg_negative_prob": abs(avg_negative_prob),
                     "play_probability": outcome.line_with_pev.no_vig_probability,
                 })
 

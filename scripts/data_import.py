@@ -20,14 +20,14 @@ conn = create_api_connection()
 
 # Add the sports and market arrays
 sports = ['icehockey_nhl', 'basketball_nba', 'basketball_wnba', 'basketball_ncaab', 'baseball_mlb',
-          'americanfootball_nfl', 'mma_mixed_martial_arts', 'americanfootball_ncaaf', 'boxing_boxing', 'icehockey_ahl']
+          'americanfootball_nfl', 'mma_mixed_martial_arts', 'americanfootball_ncaaf', 'icehockey_ahl']
 default_markets = {'h2h', 'totals', 'spreads'}
 betting_markets = ['h2h', 'totals', 'spreads']
 regions = ["us", "us2"]
 
 supported_markets = {
     'mma_mixed_martial_arts': {'h2h'},
-    'boxing_boxing': {'h2h'},
+    # 'boxing_boxing': {'h2h'},
     # Other sports default to all markets unless specified
 }
 

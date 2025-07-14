@@ -50,7 +50,6 @@ class Event:
                 case _:
                     print("A type has not matched, an error has occurred.")
 
-
     def process_averages(self):
         """
         Given an event with a positive and negative array of lines, find the vig-removed market average of those lines and
