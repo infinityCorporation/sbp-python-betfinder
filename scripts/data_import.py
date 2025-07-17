@@ -102,6 +102,7 @@ def games_loop_call(parsed_url, bet_key):
                         'team_one': home_team,
                         'team_two': away_team,
                         'event': event_name,
+                        'event_uid': event_data['id'],
                     }
                     all_lines.append(line_object)
 

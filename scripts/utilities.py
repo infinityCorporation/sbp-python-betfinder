@@ -73,7 +73,7 @@ def event_import_v2(markets, cur):
             x['sport_key'],
             x['sport_name'],
             Json(x['markets']),  # Now a clean single JSONB object
-            x['bet_key']
+            x['bet_key'],
         )
         for x in markets
     ]
@@ -86,8 +86,8 @@ def lines_import_v2(lines, cur):
     """
     Bulk insert line objects into the 'lines_data' table using execute_values for efficiency.
     """
-    sql = """ INSERT INTO lines_data ( uid, key, last_update, outcomes, commence_time, book, team_one, team_two, event
-    ) VALUES %s
+    sql = """ INSERT INTO lines_data ( uid, key, last_update, outcomes, commence_time, book, team_one, team_two, event,
+    event_uid ) VALUES %s
     """
 
 
@@ -108,6 +108,7 @@ def lines_import_v2(lines, cur):
             y['team_one'],
             y['team_two'],
             y['event'],
+            y['event_uid'],
         )
         for y in lines
     ]
