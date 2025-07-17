@@ -58,7 +58,7 @@ def event_import_v2(markets, cur):
     sql = """
     INSERT INTO all_data (
         uid, event, commence_time, update_time, home_team, away_team,
-        sport_key, sport_title, markets, bet_key
+        sport_key, sport_title, markets, bet_key, event_uid
     ) VALUES %s
     """
 
@@ -74,6 +74,7 @@ def event_import_v2(markets, cur):
             x['sport_name'],
             Json(x['markets']),  # Now a clean single JSONB object
             x['bet_key'],
+            x["event_uid"],
         )
         for x in markets
     ]

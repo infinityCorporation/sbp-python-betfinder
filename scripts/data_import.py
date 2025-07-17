@@ -127,7 +127,7 @@ def games_loop_call(parsed_url, bet_key):
             else:
                 all_markets.append({
                     'uid': uid,
-                    'id': event_id,
+                    'event_uid': event_id,
                     'event': event_name,
                     'commence_time': commence_time,
                     'update_time': update_time,
