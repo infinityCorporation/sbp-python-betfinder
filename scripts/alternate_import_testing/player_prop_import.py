@@ -76,7 +76,6 @@ def games_loop_call(parsed_url, bet_key):
     :param bet_key: Identifier for bet type (e.g., spreads, totals, h2h).
     """
     for event_data in parsed_url:
-        print("working on", event_data)
 
         try:
             uid = str(uuid.uuid4())
