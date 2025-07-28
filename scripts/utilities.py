@@ -118,6 +118,73 @@ def lines_import_v2(lines, cur):
     print(f"{len(values)} lines added.")
 
 
+def player_event_import_v1(markets, cur):
+    """
+    Bulk inserts event data into the all_data table, assuming markets is now a JSONB column.
+    """
+    sql = """
+    INSERT INTO player_prop_data (
+        uid, event, commence_time, update_time, home_team, away_team,
+        sport_key, sport_title, markets, bet_key, event_uid
+    ) VALUES %s
+    """
+
+    values = [
+        (
+            x['uid'],
+            x["event"],
+            x['commence_time'],
+            x['update_time'],
+            x['home_team'],
+            x['away_team'],
+            x['sport_key'],
+            x['sport_name'],
+            Json(x['markets']),  # Now a clean single JSONB object
+            x['bet_key'],
+            x["event_uid"],
+        )
+        for x in markets
+    ]
+
+    execute_values(cur, sql, values)
+    print(f"{len(values)} events added.")
+
+
+def player_lines_import_v1(lines, cur):
+    """
+    Bulk insert line objects into the 'lines_data' table using execute_values for efficiency.
+    """
+    sql = """ INSERT INTO player_prop_lines_data ( uid, key, last_update, outcomes, commence_time, book, team_one, team_two, event,
+    event_uid ) VALUES %s
+    """
+
+
+    def adapt_json_array(outcomes):
+        # Create a properly escaped PostgreSQL array string like:
+        # '{"{\"name\": \"Win\", \"price\": 120}" , "{\"name\": \"Lose\", \"price\": -140}"}'
+        return "{" + ",".join(json.dumps(o).replace('"', '\\"').replace("'", "''") for o in outcomes) + "}"
+
+    # Prepare the data as a list of tuples
+    values = [
+        (
+            y['uid'],
+            y['key'],
+            y['last_update'],
+            Json(y['outcomes']),
+            y['commence_time'],
+            y['book'],
+            y['team_one'],
+            y['team_two'],
+            y['event'],
+            y['event_uid'],
+        )
+        for y in lines
+    ]
+
+    execute_values(cur, sql, values)
+    print(f"{len(values)} lines added.")
+
+
 def compare_lines(first_line, second_line):
     """
     The goal here is to take two lines and compare them, returning a positive line and a negative line as a Line object

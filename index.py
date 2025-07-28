@@ -1,6 +1,7 @@
 from scripts.data_import import get_data
 import psycopg2
 from psycopg2 import pool
+from scripts.alternate_import_testing.player_prop_import import get_data as player_data
 
 def get_db_pool():
     print("Getting db pool...")
@@ -28,6 +29,7 @@ def main():
 
     print("Calling the main functions now...")
     get_data(db_connection, cur)
+    player_data(db_connection, cur)
 
     print("Closing the existing connections!")
     cur.close()

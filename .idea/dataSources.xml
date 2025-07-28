@@ -9,5 +9,13 @@
       <jdbc-url>jdbc:postgresql://localhost:5432/postgres</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
+    <data-source source="LOCAL" name="postgres-bet-data" uuid="7b89f0d8-b69f-4997-873f-88b3d505ce42">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <remarks>Betting Database in Postgresql</remarks>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://bet-data.cr086aqucn7m.us-east-2.rds.amazonaws.com:5432/postgres</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+    </data-source>
   </component>
 </project>
