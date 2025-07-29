@@ -1,39 +1,23 @@
-# For player props, the goals are:
-# Create a row for a player that their lines and outcomes can be attached to
-# Find a way to compare the lines only for a given player, on a given metric, at a given point (exclusively)
-
-### Old system of importing for h2h, spreads, and totals:
-import uuid
 from datetime import datetime, timezone
-import json
-from email.utils import parsedate_to_datetime
-
-import requests
-
 from scripts.alternate_import import betting_markets
-from scripts.arbitrage import arbitrage_main
 from scripts.dbmanager import clear_bet_table
-from scripts.pev2 import ev_main
-from scripts.utilities import event_import_v2, lines_import_v2, create_api_connection
+from scripts.utilities import create_api_connection
+from ..utilities import player_event_import_v1, player_lines_import_v1
+import uuid
+from psycopg2.extras import execute_values
+import json
 
-# 100k key frisbiecorp@gmail.com: 3016e10212283b7a71a72dc824bacb34
+# 100k key frisbiecorp@gmail.com: 3016e10212283b7a71a72dc824bacb34 - Cancelled
+# 5M key frisbiecorp@gmail.com: 050d89b464607afacc0f6f6e1d3c55d3
 
 apiKey = "3016e10212283b7a71a72dc824bacb34"
 conn = create_api_connection()
 
 # Add the sports and market arrays
-# Replace this with the markets for player props
 sports = ['icehockey_nhl', 'basketball_nba', 'basketball_wnba', 'basketball_ncaab', 'baseball_mlb',
           'americanfootball_nfl', 'mma_mixed_martial_arts', 'americanfootball_ncaaf', 'icehockey_ahl']
-default_markets = {'h2h'}
 betting_markets = ['h2h']
 regions = ["us", "us2"]
-
-supported_markets = {
-    'mma_mixed_martial_arts': {'h2h'},
-    # 'boxing_boxing': {'h2h'},
-    # Other sports default to all markets unless specified
-}
 
 current_utc_time = datetime.now(timezone.utc)
 date_time = current_utc_time.strftime('%Y-%m-%dT%H:%M:%SZ')
@@ -43,30 +27,30 @@ all_markets = []
 all_lines = []
 all_event_ids = []
 
-## The following information will most likely change for player props
+# First, get all the events from the all_data table (Can also have these passed in from the data import)
+mlb_props = ("batter_home_runs,batter_hits,batter_total_bases,batter_rbis,batter_runs_scored," +
+                          "batter_hits_runs_rbis,batter_singles,batter_doubles,batter_triples,batter_walks," +
+                          "batter_strikeouts,batter_stolen_bases,pitcher_strikeouts,pitcher_hits_allowed," +
+                          "pitcher_walks,pitcher_earned_runs,pitcher_outs")
 
-# Pull the data from the api
-# From the API an array is sent with the following structure:
-# - [Array] Upcoming Games (a)
-#   - Game Information
-#   - [Array] All Bookmakers (x)
-#       - [Array] Markets (y)
-#           - Bookmaker Information
-#           - [Array] Outcomes (current odds) (z)
-#               - [Object] Team Name and Odds
+nfl_props = ("player_assists,player_defensive_interceptions,player_field_goals,player_kicking_points,"
+             "player_pass_attempts,player_pass_completions,player_pass_interceptions,player_pass_longest_completion,"
+             "player_pass_rush_reception_tds,player_pass_rush_reception_yds,player_pass_tds,player_pass_yds,"
+             "player_pass_yds_q1,player_pats,player_receptions,player_reception_longest,player_reception_tds,"
+             "player_reception_yds,player_rush_attempts,player_rush_longest,player_rush_reception_tds,"
+             "player_rush_reception_yds,player_rush_tds,player_rush_yds,player_sacks,player_solo_tackles,"
+             "player_tackles_assists")
 
+supported_props = {
+    'baseball_mlb': mlb_props,
+    #'americanfootball_nfl': nfl_props,
+    #'basketball_nba': nba_props <- need to create this one
+}
 
-def clean_up_prep(cursor):
-    """
-    This functions purpose is to clean up the database and prep it for another data pull. The idea is to clear any
-    events that have ended, been cancelled, or duplicates.
-    :param cursor:
-    :return:
-    """
+player_events = []
+player_lines = []
 
-    # Delete all
-    clear_bet_table(cursor, "lines_data")
-    clear_bet_table(cursor, "all_data")
+player_events_for_processing = []
 
 
 def games_loop_call(parsed_url, bet_key):
@@ -149,94 +133,6 @@ def games_loop_call(parsed_url, bet_key):
             print(json.dumps(event_data, indent=2))
             print(f"Exception: {e}")
 
-
-def get_data(connection, cur):
-    """
-    This function actually makes the http calls to the API to get the data. It first calls a database clean up, then
-    calls the data, then passes it to games_loop_call to format, then it checks each event in the all_market array for
-    duplicates, then it deletes duplicate events and lines, then it adds the event to the database table.
-    :param connection:
-    :param cur:
-    :return:
-    """
-
-    connection.commit()
-
-    # This grabs all the lines from the api and pushes them to the all_markets array
-    for s in sports:
-        valid_markets = supported_markets.get(s, default_markets)
-
-        for m in betting_markets:
-            parsed_array = []
-
-            if m not in valid_markets:
-                continue
-
-            for r in regions:
-                url = f"/v4/sports/{s}/odds/?regions={r}&oddsFormat=american&markets={m}&apiKey={apiKey}"
-                conn.request("GET", url)
-
-                response = conn.getresponse()
-                parsed = response.json()
-                for x in parsed:
-                    parsed_array.append(x)
-                print(r, " ", len(parsed_array))
-
-            games_loop_call(parsed_array, m)
-
-    # Clean up just before import, not when the program starts
-    # clean_up_prep(cur)
-
-    # Call the utility to import all events with duplicate check
-    # event_import_v2(all_markets, cur)
-
-    # Call the utility to import all lines
-    # lines_import_v2(all_lines, cur)
-
-    # arbitrage_main(connection, cur, all_markets, all_lines)
-    # ev_main(connection, cur, all_markets, all_lines)
-
-    player_prop_main(all_markets, cur)
-
-    # Call the import for all alternative event markets - Not always needed
-    # alternate_import(all_event_ids, cur)
-
-    # Commit all database changes for data import and alternative import
-    connection.commit()
-
-
-### New method built from old design:
-from ..utilities import player_event_import_v1, player_lines_import_v1
-import uuid
-from psycopg2.extras import execute_values
-import json
-
-# First, get all the events from the all_data table (Can also have these passed in from the data import)
-player_prop_keys = ['batter_home_runs', 'batter_hits', 'batter_total_bases', 'batter_singles', 'batter_doubles',
-                    'batter_triples', 'pitcher_strikeouts', 'pitcher_walks', 'pitcher_outs']
-player_prop_string = "batter_home_runs,batter_hits,batter_total_bases,batter_singles,batter_doubles,batter_triples,pitcher_strikeouts,pitcher_walks,pitcher_outs"
-mlb_props = ("batter_home_runs,batter_hits,batter_total_bases,batter_rbis,batter_runs_scored," +
-                          "batter_hits_runs_rbis,batter_singles,batter_doubles,batter_triples,batter_walks," +
-                          "batter_strikeouts,batter_stolen_bases,pitcher_strikeouts,pitcher_hits_allowed," +
-                          "pitcher_walks,pitcher_earned_runs,pitcher_outs")
-
-nfl_props = ("player_assists,player_defensive_interceptions,player_field_goals,player_kicking_points,"
-             "player_pass_attempts,player_pass_completions,player_pass_interceptions,player_pass_longest_completion,"
-             "player_pass_rush_reception_tds,player_pass_rush_reception_yds,player_pass_tds,player_pass_yds,"
-             "player_pass_yds_q1,player_pats,player_receptions,player_reception_longest,player_reception_tds,"
-             "player_reception_yds,player_rush_attempts,player_rush_longest,player_rush_reception_tds,"
-             "player_rush_reception_yds,player_rush_tds,player_rush_yds,player_sacks,player_solo_tackles,"
-             "player_tackles_assists")
-
-supported_props = {
-    'baseball_mlb': mlb_props,
-    'americanfootball_nfl': nfl_props,
-}
-
-player_events = []
-player_lines = []
-
-player_events_for_processing = []
 
 def player_props_loop_call(parsed_url, bet_key):
     """
@@ -438,6 +334,41 @@ def format_snake_case_label(snake_str):
     Example: "batter_hits_runs_rbis" -> "Batter Hits Runs Rbis"
     """
     return ' '.join(word.capitalize() for word in snake_str.split('_'))
+
+
+def get_data(connection, cur):
+    """
+    This function actually makes the http calls to the API to get the data. It first calls a database clean up, then
+    calls the data, then passes it to games_loop_call to format, then it checks each event in the all_market array for
+    duplicates, then it deletes duplicate events and lines, then it adds the event to the database table.
+    :param connection:
+    :param cur:
+    :return:
+    """
+
+    connection.commit()
+
+    # This grabs all the lines from the api and pushes them to the all_markets array
+    for s in sports:
+        for m in betting_markets:
+            parsed_array = []
+
+            for r in regions:
+                url = f"/v4/sports/{s}/odds/?regions={r}&oddsFormat=american&markets={m}&apiKey={apiKey}"
+                conn.request("GET", url)
+
+                response = conn.getresponse()
+                parsed = response.json()
+                for x in parsed:
+                    parsed_array.append(x)
+                print(r, " ", len(parsed_array))
+
+            games_loop_call(parsed_array, m)
+
+    player_prop_main(all_markets, cur)
+
+    # Commit all database changes for data import and alternative import
+    connection.commit()
 
 
 def player_prop_main(event_array, cursor):
