@@ -13,10 +13,11 @@ from scripts.utilities import event_import_v2, lines_import_v2, create_api_conne
 # contact@arrayassistant.ai: 098b369ca52dc641b2bea6c901c24887
 # efrisbie2232@gmail.com: cc1dcf7f444d59f7e4940113969b8e19
 
-# pro key frisbiecorp@gmail.com: c95efda5321b24d2bbb587407b6d0012
-# 100k key frisbiecorp@gmail.com: 3016e10212283b7a71a72dc824bacb34
+# pro key frisbiecorp@gmail.com: c95efda5321b24d2bbb587407b6d0012 - Cancelled
+# 100k key frisbiecorp@gmail.com: 3016e10212283b7a71a72dc824bacb34 - Cancelled
+# 5M key frisbiecorp@gmail.com: 050d89b464607afacc0f6f6e1d3c55d3
 
-apiKey = "3016e10212283b7a71a72dc824bacb34"
+apiKey = "050d89b464607afacc0f6f6e1d3c55d3"
 conn = create_api_connection()
 
 # Add the sports and market arrays
