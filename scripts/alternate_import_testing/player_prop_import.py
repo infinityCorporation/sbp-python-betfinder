@@ -10,7 +10,7 @@ import json
 # 100k key frisbiecorp@gmail.com: 3016e10212283b7a71a72dc824bacb34 - Cancelled
 # 5M key frisbiecorp@gmail.com: 050d89b464607afacc0f6f6e1d3c55d3
 
-apiKey = "3016e10212283b7a71a72dc824bacb34"
+apiKey = "050d89b464607afacc0f6f6e1d3c55d3"
 conn = create_api_connection()
 
 # Add the sports and market arrays
