@@ -28,12 +28,12 @@ all_lines = []
 all_event_ids = []
 
 # First, get all the events from the all_data table (Can also have these passed in from the data import)
-mlb_props = ("batter_home_runs,batter_hits,batter_total_bases,batter_rbis,batter_runs_scored," +
-                          "batter_hits_runs_rbis,batter_singles,batter_doubles,batter_triples,batter_walks," +
-                          "batter_strikeouts,batter_stolen_bases,pitcher_strikeouts,pitcher_hits_allowed," +
-                          "pitcher_walks,pitcher_earned_runs,pitcher_outs")
+baseball_props = ("batter_home_runs,batter_hits,batter_total_bases,batter_rbis,batter_runs_scored,"
+              "batter_hits_runs_rbis,batter_singles,batter_doubles,batter_triples,batter_walks,"
+              "batter_strikeouts,batter_stolen_bases,pitcher_strikeouts,pitcher_hits_allowed,"
+              "pitcher_walks,pitcher_earned_runs,pitcher_outs")
 
-nfl_props = ("player_assists,player_defensive_interceptions,player_field_goals,player_kicking_points,"
+football_props = ("player_assists,player_defensive_interceptions,player_field_goals,player_kicking_points,"
              "player_pass_attempts,player_pass_completions,player_pass_interceptions,player_pass_longest_completion,"
              "player_pass_rush_reception_tds,player_pass_rush_reception_yds,player_pass_tds,player_pass_yds,"
              "player_pass_yds_q1,player_pats,player_receptions,player_reception_longest,player_reception_tds,"
@@ -41,10 +41,24 @@ nfl_props = ("player_assists,player_defensive_interceptions,player_field_goals,p
              "player_rush_reception_yds,player_rush_tds,player_rush_yds,player_sacks,player_solo_tackles,"
              "player_tackles_assists")
 
+basketball_props = ("player_points,player_points_q1,player_rebounds,player_rebounds_q1,player_assists,player_assists_q1,"
+             "player_threes,player_blocks,player_steals,player_blocks_steals,player_turnovers,"
+             "player_points_rebounds_assists,player_points_rebounds,player_points_assists,player_rebounds_assists,"
+             "player_field_goals,player_frees_made,player_frees_attempts")
+
+hockey_props = ("player_points,player_power_play_points,player_assists,player_blocked_shots,player_shots_on_goal,"
+             "player_goals,player_total_saves")
+
+
 supported_props = {
-    'baseball_mlb': mlb_props,
-    #'americanfootball_nfl': nfl_props,
-    #'basketball_nba': nba_props <- need to create this one
+    'baseball_mlb': baseball_props,
+    'americanfootball_nfl': football_props,
+    'americanfootball_ncaaf': football_props,
+    'basketball_nba': basketball_props,
+    'basketball_wnba': basketball_props,
+    'basketball_ncaab': basketball_props,
+    'icehockey_nhl': hockey_props,
+    'icehockey_ahl': hockey_props,
 }
 
 player_events = []
@@ -468,13 +482,13 @@ def player_prop_main(event_array, cursor):
                                     "home_team": event['home_team'],
                                     "away_team": event['away_team'],
                                     "sport": event['sport_name'],
-                                    "bet_type": over['prop'],
+                                    "bet_type": format_snake_case_label(over['prop']),
                                     "positive_play_price": over['price'],
-                                    "positive_play_name": f"{over['description']} - {over['name']} {over['point']} - {format_snake_case_label(over['prop'])}",
+                                    "positive_play_name": f"{over['description']} - {over['name']} {over['point']}",
                                     "positive_play_book": over['book'],
                                     "positive_play_stake": 1,
                                     "negative_play_price": under['price'],
-                                    "negative_play_name": f"{under['description']} - {under['name']} {under['point']} - {under['prop']}",
+                                    "negative_play_name": f"{under['description']} - {under['name']} {under['point']}",
                                     "negative_play_book": under['book'],
                                     "negative_play_stake": stake_b,
                                     "arb_percent": arb_percent,
@@ -492,13 +506,13 @@ def player_prop_main(event_array, cursor):
                                     "home_team": event['home_team'],
                                     "away_team": event['away_team'],
                                     "sport": event['sport_name'],
-                                    "bet_type": over['prop'],
+                                    "bet_type": format_snake_case_label(over['prop']),
                                     "positive_play_price": under['price'],
-                                    "positive_play_name": f"{under['description']} - {under['name']} {under['point']} - {format_snake_case_label(under['prop'])}",
+                                    "positive_play_name": f"{under['description']} - {under['name']} {under['point']}",
                                     "positive_play_book": under['book'],
                                     "positive_play_stake": 1,
                                     "negative_play_price": over['price'],
-                                    "negative_play_name": f"{over['description']} - {over['name']} {over['point']} - {format_snake_case_label(over['prop'])}",
+                                    "negative_play_name": f"{over['description']} - {over['name']} {over['point']}",
                                     "negative_play_book": over['book'],
                                     "negative_play_stake": stake_b,
                                     "arb_percent": arb_percent,
