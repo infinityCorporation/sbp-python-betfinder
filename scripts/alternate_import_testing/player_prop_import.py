@@ -154,9 +154,10 @@ def player_props_loop_call(parsed_url, bet_key):
     :param bet_key: Identifier for bet type (e.g., spreads, totals, h2h).
     """
     for event_data in parsed_url:
-
+        print(event_data)
         try:
             uid = str(uuid.uuid4())
+            # the error is occurring here
             event_id = event_data['id']
             home_team = event_data['home_team']
             away_team = event_data['away_team']

@@ -1,0 +1,10 @@
+To run the server manually navigate to /var/app and run:
+
+>> venv/staging-LQM1lest/bin/python3 current/index.py
+
+Otherwise, the server uses crontab to run every 15 minutes at current. To access crontab to make edits you
+can type:
+
+>> crontab -e
+
+To save, it is a vim environment so you can use ":wq" to write and quit or ":q!" to quit without saving.
