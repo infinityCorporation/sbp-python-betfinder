@@ -74,7 +74,7 @@ def games_loop_call(parsed_url, bet_key):
     :param bet_key: Identifier for bet type (e.g., spreads, totals, h2h).
     """
     for event_data in parsed_url:
-
+        print(event_data)
         try:
             uid = str(uuid.uuid4())
             event_id = event_data['id']
@@ -424,17 +424,28 @@ def player_prop_main(event_array, cursor):
 
     arbitrage_object_collection = []
 
-    for event in player_events_for_processing:
-        over_lines = []
-        under_lines = []
-        event_iteration_count = 0
+    try:
+        for event in player_events_for_processing:
+            over_lines = []
+            under_lines = []
+            event_iteration_count = 0
 
-        for market in event['markets']:
-            for line in market['lines']:
-                for outcome in line['outcomes']:
-                    if outcome['name'] == "Over":
-                        if outcome not in over_lines:
-                            over_lines.append({
+            for market in event['markets']:
+                for line in market['lines']:
+                    for outcome in line['outcomes']:
+                        if outcome['name'] == "Over":
+                            if outcome not in over_lines:
+                                over_lines.append({
+                                    "book": line['book'],
+                                    "prop": line['key'],
+                                    "name": outcome['name'],
+                                    "description": outcome['description'],
+                                    "price": outcome['price'],
+                                    "point": outcome['point'],
+                                })
+                        else:
+                            if outcome not in under_lines:
+                                under_lines.append({
                                 "book": line['book'],
                                 "prop": line['key'],
                                 "name": outcome['name'],
@@ -442,82 +453,75 @@ def player_prop_main(event_array, cursor):
                                 "price": outcome['price'],
                                 "point": outcome['point'],
                             })
-                    else:
-                        if outcome not in under_lines:
-                            under_lines.append({
-                            "book": line['book'],
-                            "prop": line['key'],
-                            "name": outcome['name'],
-                            "description": outcome['description'],
-                            "price": outcome['price'],
-                            "point": outcome['point'],
-                        })
 
-        for over in over_lines:
-            for under in under_lines:
-                event_iteration_count += 1
-                if (over['book'] is not under['book'] and over['prop'] == under['prop']
-                        and over['description'] == under['description']):
-                    if over['point'] <= under['point']:
-                        if over['point'] < under['point']:
-                            middling_match_count += 1
-                        compare_match_count += 1
-                        arb_percent, is_arb = calculate_arbitrage(over['price'], under['price'])
+            for over in over_lines:
+                for under in under_lines:
+                    event_iteration_count += 1
+                    if (over['book'] is not under['book'] and over['prop'] == under['prop']
+                            and over['description'] == under['description']):
+                        if over['point'] <= under['point']:
+                            if over['point'] < under['point']:
+                                middling_match_count += 1
+                            compare_match_count += 1
+                            arb_percent, is_arb = calculate_arbitrage(over['price'], under['price'])
 
-                        if is_arb:
-                            arb_match_count += 1
-                            print("calculated arb percentage: ", arb_percent, " from ", over['price'], " - ",
-                                  under['price'])
-                            print("Arb found: arb percentage = ", arb_percent)
-                            print("Arb play: ", over, " and ", under)
+                            if is_arb:
+                                arb_match_count += 1
+                                print("calculated arb percentage: ", arb_percent, " from ", over['price'], " - ",
+                                      under['price'])
+                                print("Arb found: arb percentage = ", arb_percent)
+                                print("Arb play: ", over, " and ", under)
 
-                            if (over['price'] > under['price']):
-                                stake_b = calculate_arbitrage_stake(over['price'], under['price'])
+                                if (over['price'] > under['price']):
+                                    stake_b = calculate_arbitrage_stake(over['price'], under['price'])
 
-                                arb_table_object = {
-                                    "uid": str(uuid.uuid4()),
-                                    "event_uid": event['uid'],
-                                    "game": event['event'],
-                                    "commence_time": event['commence_time'],
-                                    "home_team": event['home_team'],
-                                    "away_team": event['away_team'],
-                                    "sport": event['sport_name'],
-                                    "bet_type": format_snake_case_label(over['prop']),
-                                    "positive_play_price": over['price'],
-                                    "positive_play_name": f"{over['description']} - {over['name']} {over['point']}",
-                                    "positive_play_book": over['book'],
-                                    "positive_play_stake": 1,
-                                    "negative_play_price": under['price'],
-                                    "negative_play_name": f"{under['description']} - {under['name']} {under['point']}",
-                                    "negative_play_book": under['book'],
-                                    "negative_play_stake": stake_b,
-                                    "arb_percent": arb_percent,
-                                }
-                                arbitrage_object_collection.append(arb_table_object)
+                                    arb_table_object = {
+                                        "uid": str(uuid.uuid4()),
+                                        "event_uid": event['uid'],
+                                        "game": event['event'],
+                                        "commence_time": event['commence_time'],
+                                        "home_team": event['home_team'],
+                                        "away_team": event['away_team'],
+                                        "sport": event['sport_name'],
+                                        "bet_type": format_snake_case_label(over['prop']),
+                                        "positive_play_price": over['price'],
+                                        "positive_play_name": f"{over['description']} - {over['name']} {over['point']}",
+                                        "positive_play_book": over['book'],
+                                        "positive_play_stake": 1,
+                                        "negative_play_price": under['price'],
+                                        "negative_play_name": f"{under['description']} - {under['name']} {under['point']}",
+                                        "negative_play_book": under['book'],
+                                        "negative_play_stake": stake_b,
+                                        "arb_percent": arb_percent,
+                                    }
+                                    arbitrage_object_collection.append(arb_table_object)
 
-                            else:
-                                stake_b = calculate_arbitrage_stake(under['price'], over['price'])
+                                else:
+                                    stake_b = calculate_arbitrage_stake(under['price'], over['price'])
 
-                                arb_table_object = {
-                                    "uid": str(uuid.uuid4()),
-                                    "event_uid": event['uid'],
-                                    "game": event['event'],
-                                    "commence_time": event['commence_time'],
-                                    "home_team": event['home_team'],
-                                    "away_team": event['away_team'],
-                                    "sport": event['sport_name'],
-                                    "bet_type": format_snake_case_label(over['prop']),
-                                    "positive_play_price": under['price'],
-                                    "positive_play_name": f"{under['description']} - {under['name']} {under['point']}",
-                                    "positive_play_book": under['book'],
-                                    "positive_play_stake": 1,
-                                    "negative_play_price": over['price'],
-                                    "negative_play_name": f"{over['description']} - {over['name']} {over['point']}",
-                                    "negative_play_book": over['book'],
-                                    "negative_play_stake": stake_b,
-                                    "arb_percent": arb_percent,
-                                }
-                                arbitrage_object_collection.append(arb_table_object)
+                                    arb_table_object = {
+                                        "uid": str(uuid.uuid4()),
+                                        "event_uid": event['uid'],
+                                        "game": event['event'],
+                                        "commence_time": event['commence_time'],
+                                        "home_team": event['home_team'],
+                                        "away_team": event['away_team'],
+                                        "sport": event['sport_name'],
+                                        "bet_type": format_snake_case_label(over['prop']),
+                                        "positive_play_price": under['price'],
+                                        "positive_play_name": f"{under['description']} - {under['name']} {under['point']}",
+                                        "positive_play_book": under['book'],
+                                        "positive_play_stake": 1,
+                                        "negative_play_price": over['price'],
+                                        "negative_play_name": f"{over['description']} - {over['name']} {over['point']}",
+                                        "negative_play_book": over['book'],
+                                        "negative_play_stake": stake_b,
+                                        "arb_percent": arb_percent,
+                                    }
+                                    arbitrage_object_collection.append(arb_table_object)
+    except Exception:
+        print("Something went wrong")
+        print(Exception.with_traceback())
 
     arbitrage_bulk_insert(arbitrage_object_collection, cursor)
 
