@@ -6,6 +6,7 @@ from ..utilities import player_event_import_v1, player_lines_import_v1
 import uuid
 from psycopg2.extras import execute_values
 import json
+import time
 
 # 100k key frisbiecorp@gmail.com: 3016e10212283b7a71a72dc824bacb34 - Cancelled
 # 5M key frisbiecorp@gmail.com: 050d89b464607afacc0f6f6e1d3c55d3
@@ -155,6 +156,7 @@ def player_props_loop_call(parsed_url, bet_key):
     """
     for event_data in parsed_url:
         print(event_data)
+        time.sleep(0.1)
         try:
             uid = str(uuid.uuid4())
             # the error is occurring here
