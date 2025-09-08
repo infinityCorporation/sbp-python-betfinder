@@ -1,6 +1,8 @@
 # Library imports
 import json
 import uuid
+from asyncio import sleep
+
 import numpy as np
 import http.client as client
 import ssl
@@ -227,6 +229,7 @@ def calculate_probability(odds):
     :param odds:
     :return:
     """
+
     if odds > 0:
         return round(((100 / (odds + 100)) * 100), 2)
     elif odds < 0:

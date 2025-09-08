@@ -55,7 +55,8 @@ def pev_bulk_insert(pev_insert_array, cur):
         commence_time, positive_play_price, positive_play_name,
         positive_play_percentage, sport, book, opposing_play_price,
         no_vig_probability, pev_line_probability, bet_type,
-        avg_positive_probability, avg_negative_probability, play_probability
+        avg_positive_probability, avg_negative_probability, play_probability,
+        avg_positive_vigged_probability, avg_negative_vigged_probability
     ) VALUES %s
     """
 
@@ -79,6 +80,8 @@ def pev_bulk_insert(pev_insert_array, cur):
             x["avg_positive_prob"],
             x["avg_negative_prob"],
             x["play_probability"],
+            x["avg_positive_vigged_probability"],
+            x["avg_negative_vigged_probability"],
         )
         for x in pev_insert_array
     ]
@@ -117,9 +120,9 @@ def pev_main_loop(events, cur):
 
         if event.positive_ev_outcomes:
             prob_map = {
-                'h2h': (event.average_positive_probability_h2h, (event.average_negative_probability_h2h)),
-                'totals': (event.average_positive_probability_totals, (event.average_negative_probability_totals)),
-                'spreads': (event.average_positive_probability_spreads, (event.average_negative_probability_spreads))
+                'h2h': (event.average_positive_probability_h2h, event.average_negative_probability_h2h, event.average_positive_vigged_probability_h2h, event.average_negative_vigged_probability_h2h),
+                'totals': (event.average_positive_probability_totals, event.average_negative_probability_totals, event.average_positive_vigged_probability_totals, event.average_negative_vigged_probability_totals),
+                'spreads': (event.average_positive_probability_spreads, event.average_negative_probability_spreads, event.average_positive_vigged_probability_spreads, event.average_negative_vigged_probability_spreads)
             }
 
             for outcome in event.positive_ev_outcomes:
@@ -128,7 +131,7 @@ def pev_main_loop(events, cur):
                     else outcome.negative_line.price
                 )
 
-                avg_positive_prob, avg_negative_prob = prob_map.get(outcome.bet_type, (0, 0))
+                avg_positive_prob, avg_negative_prob, avg_pos_vigged_prob, avg_neg_vigged_prob = prob_map.get(outcome.bet_type, (0, 0, 0, 0))
 
                 insert_array.append({
                     "uid": str(uuid.uuid4()),
@@ -146,9 +149,11 @@ def pev_main_loop(events, cur):
                     "no_vig_probability": outcome.line_with_pev.no_vig_probability,
                     "pev_line_probability": outcome.line_with_pev.probability,
                     "bet_type": outcome.bet_type,
-                    "avg_positive_prob": avg_positive_prob,
+                    "avg_positive_prob": abs(avg_positive_prob),
                     "avg_negative_prob": abs(avg_negative_prob),
                     "play_probability": outcome.line_with_pev.no_vig_probability,
+                    "avg_positive_vigged_probability": abs(avg_pos_vigged_prob),
+                    "avg_negative_vigged_probability": abs(avg_neg_vigged_prob),
                 })
 
     pev_bulk_insert(insert_array, cur)

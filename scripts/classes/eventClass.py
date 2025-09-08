@@ -22,16 +22,22 @@ class Event:
         # Averages per market
         self.average_positive_h2h = None
         self.average_positive_probability_h2h = None
+        self.average_positive_vigged_probability_h2h = None
         self.average_negative_h2h = None
         self.average_negative_probability_h2h = None
+        self.average_negative_vigged_probability_h2h = None
         self.average_positive_spreads = None
         self.average_positive_probability_spreads = None
+        self.average_positive_vigged_probability_spreads = None
         self.average_negative_spreads = None
         self.average_negative_probability_spreads = None
+        self.average_negative_vigged_probability_spreads = None
         self.average_positive_totals = None
         self.average_positive_probability_totals = None
+        self.average_positive_vigged_probability_totals = None
         self.average_negative_totals = None
         self.average_negative_probability_totals = None
+        self.average_negative_vigged_probability_totals = None
 
         # Positive lines
         self.positive_ev_outcomes: [Outcome] = []
@@ -60,7 +66,9 @@ class Event:
         positive_h2h_average, positive_totals_average, positive_spreads_average = 0, 0, 0
         negative_h2h_average, negative_totals_average, negative_spreads_average = 0, 0, 0
         positive_h2h_probability_avg, positive_totals_probability_avg, positive_spreads_probability_avg = 0, 0, 0
-        negative_h2h_probability_avg, negative_totals_probability_avg, negative_spreads_probability_avg = 0, 0, 0
+        negative_h2h_probability_avg, negative_totals_probability_avg, negative_spreads_probability_avg= 0, 0, 0
+        positive_vigged_h2h_prob, positive_vigged_totals_prob, positive_vigged_spreads_prob = 0, 0, 0
+        negative_vigged_h2h_prob, negative_vigged_totals_prob, negative_vigged_spreads_prob = 0, 0, 0
 
         for output in self.array_h2h:
             positive_h2h_average += output.positive_line.no_vig_price
@@ -68,11 +76,17 @@ class Event:
             negative_h2h_average += abs(output.negative_line.no_vig_price)
             negative_h2h_probability_avg += output.negative_line.no_vig_probability
 
+            positive_vigged_h2h_prob += output.positive_line.probability
+            negative_vigged_h2h_prob += output.negative_line.probability
+
         for output in self.array_totals:
             positive_totals_average += output.positive_line.no_vig_price
             positive_totals_probability_avg += output.positive_line.no_vig_probability
             negative_totals_average += abs(output.negative_line.no_vig_price)
             negative_totals_probability_avg += output.negative_line.no_vig_probability
+
+            positive_vigged_totals_prob += output.positive_line.probability
+            negative_vigged_totals_prob += output.negative_line.probability
 
         for output in self.array_spreads:
             positive_spreads_average += output.positive_line.no_vig_price
@@ -80,11 +94,16 @@ class Event:
             negative_spreads_average += abs(output.negative_line.no_vig_price)
             negative_spreads_probability_avg += output.negative_line.no_vig_probability
 
+            positive_vigged_spreads_prob += output.positive_line.probability
+            negative_vigged_spreads_prob += output.negative_line.probability
+
         if len(self.array_h2h) > 0:
             self.average_positive_h2h = round(positive_h2h_average / len(self.array_h2h), 2)
             self.average_negative_h2h = round(- (negative_h2h_average / len(self.array_h2h)), 2)
             self.average_positive_probability_h2h = round(positive_h2h_probability_avg / len(self.array_h2h), 2)
             self.average_negative_probability_h2h = round(- (negative_h2h_probability_avg / len(self.array_h2h)), 2)
+            self.average_positive_vigged_probability_h2h = round(positive_vigged_h2h_prob / len(self.array_h2h), 2)
+            self.average_negative_vigged_probability_h2h = round(- (negative_vigged_h2h_prob / len(self.array_h2h)), 2)
 
         if len(self.array_totals) > 0:
             self.average_positive_totals = round(positive_totals_average / len(self.array_totals), 2)
@@ -93,6 +112,8 @@ class Event:
                                                              / len(self.array_totals), 2)
             self.average_negative_probability_totals = round(- (negative_totals_probability_avg
                                                                 / len(self.array_totals)), 2)
+            self.average_positive_vigged_probability_totals = round(positive_vigged_totals_prob / len(self.array_h2h), 2)
+            self.average_negative_vigged_probability_totals = round(- (negative_vigged_totals_prob / len(self.array_h2h)), 2)
 
         if len(self.array_spreads) > 0:
             self.average_positive_spreads = round(positive_spreads_average / len(self.array_spreads), 2)
@@ -101,6 +122,8 @@ class Event:
                                                               / len(self.array_spreads), 2)
             self.average_negative_probability_spreads = round(- (negative_spreads_probability_avg
                                                                  / len(self.array_spreads)), 2)
+            self.average_positive_vigged_probability_spreads = round(positive_vigged_spreads_prob / len(self.array_h2h), 2)
+            self.average_negative_vigged_probability_spreads = round(- (negative_vigged_spreads_prob / len(self.array_h2h)), 2)
 
     def process_ev(self):
         """
@@ -109,10 +132,12 @@ class Event:
         """
         if len(self.array_h2h) > 0:
             for outcome in self.array_h2h:
-                if outcome.positive_line.no_vig_price > self.average_positive_h2h:
+                if (outcome.positive_line.no_vig_probability < self.average_positive_probability_h2h and
+                        outcome.positive_line.no_vig_price > self.average_positive_h2h):
                     outcome.line_with_pev = outcome.positive_line
                     self.positive_ev_outcomes.append(outcome)
-                elif outcome.negative_line.no_vig_price > self.average_negative_h2h:
+                elif (outcome.negative_line.no_vig_probability < self.average_negative_probability_h2h and
+                      outcome.negative_line.no_vig_price > self.average_negative_h2h):
                     outcome.line_with_pev = outcome.negative_line
                     self.positive_ev_outcomes.append(outcome)
 
