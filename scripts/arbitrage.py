@@ -149,11 +149,16 @@ def arbitrage_loop(total_array):
                                 "negative": n,
                                 "play_percentage": percentage,
                             })
+                    # Here we need to check for spreads that the names aren't equal, that the point amounts are equal, and that the point
+                    # values are not equal i.e. positive and negative
                     else:
-                        if is_arb and p['name'] != n['name'] and abs(p['point']) != abs(n['point']):
+                        if is_arb and p['name'] != n['name'] and abs(p['point']) != abs(n['point']) and p['point'] == n['point']:
                             print("Point mismatch found: ", p['point'], " - ", n['point'])
-                        if is_arb and p['name'] != n['name'] and abs(p['point']) == abs(n['point']):
+                        if is_arb and p['name'] != n['name'] and abs(p['point']) == abs(n['point']) and p['point'] != n['point']:
                             print("Positive Percentage: ", percentage)
+                            print("----------------------------------")
+                            print("point 1: ", p['point'])
+                            print("point 2: ", n['point'])
                             arbitrage_plays.append({
                                 "event_uid": event['event_uid'],
                                 "positive": p,

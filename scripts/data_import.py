@@ -193,8 +193,5 @@ def get_data(connection, cur):
     arbitrage_main(connection, cur, all_markets, all_lines)
     ev_main(connection, cur, all_markets, all_lines)
 
-    # Call the import for all alternative event markets - Not always needed
-    # alternate_import(all_event_ids, cur)
-
     # Commit all database changes for data import and alternative import
     connection.commit()
