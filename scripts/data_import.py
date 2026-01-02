@@ -3,8 +3,11 @@ import uuid
 from datetime import datetime, timezone
 import json
 
+from numpy.ma.extras import average
+
 from scripts.alternate_import import betting_markets
 from scripts.arbitrage import arbitrage_main
+from scripts.averages import averages_main
 from scripts.dbmanager import clear_bet_table
 from scripts.pev2 import ev_main
 from scripts.utilities import event_import_v2, lines_import_v2, create_api_connection
@@ -15,9 +18,9 @@ from scripts.utilities import event_import_v2, lines_import_v2, create_api_conne
 
 # pro key frisbiecorp@gmail.com: c95efda5321b24d2bbb587407b6d0012 - Cancelled
 # 100k key frisbiecorp@gmail.com: 3016e10212283b7a71a72dc824bacb34 - Cancelled
-# 5M key frisbiecorp@gmail.com: 050d89b464607afacc0f6f6e1d3c55d3
+# 5M key frisbiecorp@gmail.com: 5d797d2bf53038a801de2d57763d89ac
 
-apiKey = "050d89b464607afacc0f6f6e1d3c55d3"
+apiKey = "5d797d2bf53038a801de2d57763d89ac"
 conn = create_api_connection()
 
 # Add the sports and market arrays
@@ -25,7 +28,7 @@ sports = ['icehockey_nhl', 'basketball_nba', 'basketball_wnba', 'basketball_ncaa
           'americanfootball_nfl', 'mma_mixed_martial_arts', 'americanfootball_ncaaf', 'icehockey_ahl']
 default_markets = {'h2h', 'totals', 'spreads'}
 betting_markets = ['h2h', 'totals', 'spreads']
-regions = ["us", "us2"]
+regions = ["us", "us2"] # consider adding uk and euro books
 
 supported_markets = {
     'mma_mixed_martial_arts': {'h2h'},
@@ -190,8 +193,9 @@ def get_data(connection, cur):
     lines_import_v2(all_lines, cur)
 
     print("arb and pev running now...")
-    arbitrage_main(connection, cur, all_markets, all_lines)
-    ev_main(connection, cur, all_markets, all_lines)
+    # arbitrage_main(connection, cur, all_markets, all_lines)
+    # ev_main(connection, cur, all_markets, all_lines)
+    averages_main(all_markets, all_lines, cur)
 
     # Commit all database changes for data import and alternative import
     connection.commit()

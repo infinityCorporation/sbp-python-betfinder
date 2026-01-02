@@ -29,7 +29,7 @@ def main():
 
     print("Calling the main functions now...")
     get_data(db_connection, cur)
-    player_data(db_connection, cur)
+    # player_data(db_connection, cur)
 
     print("Closing the existing connections!")
     cur.close()
