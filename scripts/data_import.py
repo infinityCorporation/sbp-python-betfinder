@@ -193,9 +193,9 @@ def get_data(connection, cur):
     lines_import_v2(all_lines, cur)
 
     print("arb and pev running now...")
-    # arbitrage_main(connection, cur, all_markets, all_lines)
-    # ev_main(connection, cur, all_markets, all_lines)
-    averages_main(all_markets, all_lines, cur)
+    arbitrage_main(connection, cur, all_markets, all_lines)
+    ev_main(connection, cur, all_markets, all_lines)
+    # averages_main(all_markets, all_lines, cur)
 
     # Commit all database changes for data import and alternative import
     connection.commit()
